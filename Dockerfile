@@ -14,8 +14,6 @@ RUN npm install
 # Copia o restante dos arquivos
 COPY . .
 
-RUN apk update \ && apk add git
-
 # Configuração de porta
 ENV PORT=8080
 EXPOSE 8080
