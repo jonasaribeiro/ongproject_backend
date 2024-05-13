@@ -1,11 +1,11 @@
 # Base image
 FROM node:20 AS base
 
-# Instalação de dependências
-RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
-
 # Configuração do diretório de trabalho
 WORKDIR /app
+
+# Instalação de dependências
+RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
 
 # Instalação de pacotes Node
 COPY package.json .
