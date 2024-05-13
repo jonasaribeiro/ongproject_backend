@@ -1,5 +1,5 @@
 # Base image
-FROM node:20 AS base
+FROM node:20
 
 # Instalação de dependências
 RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
