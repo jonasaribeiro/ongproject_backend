@@ -24,4 +24,4 @@ RUN chmod +x /app/init.sh
 
 # Etapa de desenvolvimento
 FROM base AS development
-CMD ["/app/init.sh"]
+CMD ["bash", "/app/init.sh"]
