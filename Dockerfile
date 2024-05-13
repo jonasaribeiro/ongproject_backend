@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20 AS build
 
 RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
 
@@ -19,3 +19,9 @@ COPY init.sh /app/init.sh
 RUN chmod +x /app/init.sh
 
 CMD ["/app/init.sh"]
+
+FROM build AS development
+
+WORKDIR /app
+
+CMD ["npm", "run", "dev"]
