@@ -1,12 +1,35 @@
+version: "3.7"
 services:
   app:
-    entrypoint:
-    - sleep
-    - infinity
-    image: docker/dev-environments-javascript:stable-1
-    init: true
+    build:
+      context: .
+      target: development
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://onguser:securepassword@db:5432/ongproject?schema=public
     volumes:
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
+      - .:/app
 
+  db:
+    image: postgres:latest
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "onguser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ongproject
+      POSTGRES_USER: onguser
+      POSTGRES_PASSWORD: securepassword
+    expose:
+      - "5432"
+
+volumes:
+  postgres-data:

@@ -1,6 +1,6 @@
 FROM node:20
 
-RUN apt-get update && apt-get install -y ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
 
 WORKDIR /app
 
@@ -14,4 +14,8 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD ["node", "start"]
+COPY init.sh /app/init.sh
+
+RUN chmod +x /app/init.sh
+
+CMD ["/app/init.sh"]

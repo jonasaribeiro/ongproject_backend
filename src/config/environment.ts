@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
 import { EnvironmentVariableError } from "../errors/CustomErrors";
 
+const dotenv = require('dotenv');
 dotenv.config();
 
 const REQUIRED_ENV_VARIABLES = {
