@@ -8,8 +8,5 @@ done
 echo "PostgreSQL pronto. Executando migrações do Prisma..."
 npx prisma migrate deploy
 
-echo "Migrações aplicadas. Instalando dependências do Node.js..."
-npm install
-
-echo "Dependências instaladas. Iniciando a aplicação..."
+echo "Migrações aplicadas. Iniciando a aplicação..."
 node start
