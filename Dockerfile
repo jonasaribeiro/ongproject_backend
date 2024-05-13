@@ -1,5 +1,5 @@
 # Base image
-FROM node:20
+FROM node:20 AS build
 
 # Instalação de dependências
 RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
@@ -13,6 +13,10 @@ RUN npm install
 
 # Copia o restante dos arquivos
 COPY . .
+
+FROM build AS development
+
+RUN apk update \ && apk add git
 
 # Configuração de porta
 ENV PORT=8080
