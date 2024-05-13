@@ -12,7 +12,7 @@ services:
       DATABASE_URL: postgresql://onguser:securepassword@db:5432/ongproject?schema=public
     volumes:
       - .:/app
-      - /app/node_modules
+      - node_modules:/app/node_modules
 
   db:
     image: postgres:latest
