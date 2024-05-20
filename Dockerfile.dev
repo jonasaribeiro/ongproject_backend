@@ -1,14 +1,18 @@
 FROM node:20 AS base
 
-# Instala ffmpeg e git
+# Instala git
 RUN apt-get update && \
-    apt-get install -y ffmpeg git && \
+    apt-get install -y git && \
     apt-get clean
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src
 
-COPY . .
+# Instala as dependências de desenvolvimento, se necessário
 
-EXPOSE 3001
+COPY admin-backend/package*.json /usr/src/admin-backend/
+COPY user-backend/package*.json /usr/src/user-backend/
 
-CMD ["npm", "start"]
+RUN cd /usr/src/admin-backend && npm install
+RUN cd /usr/src/user-backend && npm install
+
+CMD ["sh", "-c", "tail -f /dev/null"]  # Mantém o container rodando para edição
