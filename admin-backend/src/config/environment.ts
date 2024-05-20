@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const REQUIRED_ENV_VARIABLES = {
-  common: ["DATABASE_URL", "SECRET_KEY", "TOKEN_EXPIRES_IN"],
+  common: ["DATABASE_URL", "SECRET_KEY", "TOKEN_EXPIRES_IN", "VIDEO_STORAGE_PATH"],
   development: [],
   production: [],
   test: [],
@@ -37,5 +37,6 @@ export const SERVER_PORT = process.env.SERVER_PORT
 export const DATABASE_URL = process.env.DATABASE_URL!;
 export const SECRET_KEY = process.env.SECRET_KEY!;
 export const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN!;
+export const VIDEO_STORAGE_PATH = process.env.VIDEO_STORAGE_PATH!;
 
 export default checkEnvironmentVariables;
