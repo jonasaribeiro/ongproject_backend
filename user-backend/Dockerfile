@@ -5,23 +5,25 @@ FROM node:20 AS base
 WORKDIR /app
 
 # Instalação de dependências
-RUN apt-get update && apt-get install -y ffmpeg postgresql postgresql-contrib
+RUN apt-get update && apt-get install -y ffmpeg
 
-# Instalação de pacotes Node
+# Copia o arquivo de pacotes e instala as dependências
 COPY package.json .
 RUN npm install
 
 # Copia o restante dos arquivos
 COPY . .
 
+# Copia o schema do Prisma (caso compartilhado)
+COPY ../prisma ./prisma
+
+# Gera o cliente do Prisma
+RUN npx prisma generate
+
 # Configuração de porta
 ENV PORT=8080
 EXPOSE 8080
 
-# Copia e prepara o script de inicialização
-COPY init.sh /app/init.sh
-RUN chmod +x /app/init.sh
-
 # Etapa de desenvolvimento
 FROM base AS development
-CMD ["bash", "/app/init.sh"]
+CMD ["npm", "run", "dev"]
