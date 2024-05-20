@@ -14,6 +14,4 @@ COPY user-backend/package*.json /usr/src/user-backend/
 RUN cd /usr/src/admin-backend && npm install
 RUN cd /usr/src/user-backend && npm install
 
-EXPOSE 3003  # Se precisar de uma porta para algum serviço de edição
-
 CMD ["sh", "-c", "tail -f /dev/null"]  # Mantém o container rodando para edição
