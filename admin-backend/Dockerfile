@@ -14,8 +14,10 @@ RUN npm install
 # Copia o restante dos arquivos
 COPY . .
 
-# Criação do arquivo .env durante o build
-RUN echo "NODE_ENV=development\nDATABASE_URL=postgresql://adminuser:ADMINPASSWORD@db:5432/admin_db\nSERVER_PORT=8081" > .env
+# Define variáveis de ambiente diretamente no Dockerfile
+ENV NODE_ENV=development
+ENV DATABASE_URL=postgresql://adminuser:ADMINPASSWORD@db:5432/admin_db
+ENV SERVER_PORT=8081
 
 # Copia o schema do Prisma (caso compartilhado)
 COPY ../prisma ./prisma
@@ -24,9 +26,7 @@ COPY ../prisma ./prisma
 RUN npx prisma generate
 
 # Configuração de porta
-ENV PORT=8081
 EXPOSE 8081
 
 # Etapa de desenvolvimento
-FROM base AS development
 CMD ["npm", "run", "dev"]
