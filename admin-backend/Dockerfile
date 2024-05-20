@@ -1,8 +1,9 @@
 FROM node:20 AS base
 
 # Instala ffmpeg e git
-RUN apk update && \
-    apk add --no-cache ffmpeg git
+RUN apt-get update && \
+    apt-get install -y ffmpeg git && \
+    apt-get clean
 
 WORKDIR /usr/src/app
 
