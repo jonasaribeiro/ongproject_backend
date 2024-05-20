@@ -8,7 +8,7 @@ const main = async () => {
     checkEnvironmentVariables();
 
     await prisma.$connect();
-    console.log("Conexão com o banco de dados estabelecida com sucesso.");
+    console.log("Conexão com o banco de dados estabelecida com sucesso!");
 
     app.listen(SERVER_PORT, () => {
       console.log(`Servidor rodando na porta ${SERVER_PORT}`);
