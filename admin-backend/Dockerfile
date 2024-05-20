@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:20 AS base
 
 # Instala ffmpeg e git
 RUN apk update && \
