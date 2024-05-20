@@ -1,48 +1,40 @@
-version: "3.7"
+version: '3.8'
+
 services:
   admin-backend:
     build:
       context: ./admin-backend
-    ports:
-      - "8081:8081"
-    depends_on:
-      - db
+      dockerfile: Dockerfile
     volumes:
-      - ./admin-backend:/app
-      - ../prisma:/app/prisma
-      - node_modules_admin:/app/node_modules
+      - ./admin-backend:/usr/src/app
+    ports:
+      - '3001:3001'
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/mydb
+    command: sh -c "npm install && tail -f /dev/null"  # Mantém o container rodando para edição
 
   user-backend:
     build:
       context: ./user-backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
+      dockerfile: Dockerfile
     volumes:
-      - ./user-backend:/app
-      - ../prisma:/app/prisma
-      - node_modules_user:/app/node_modules
+      - ./user-backend:/usr/src/app
+    ports:
+      - '3002:3002'
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/mydb
+    command: sh -c "npm install && tail -f /dev/null"  # Mantém o container rodando para edição
 
   db:
-    image: postgres:latest
-    restart: always
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "adminuser"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+    image: postgres:13
     environment:
-      POSTGRES_DB: admin_db
-      POSTGRES_USER: adminuser
-      POSTGRES_PASSWORD: securepassword
-    expose:
-      - "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
 
 volumes:
-  postgres-data:
-  node_modules_admin:
-  node_modules_user:
+  db-data:
