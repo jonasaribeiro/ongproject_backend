@@ -8,8 +8,6 @@ services:
       - "8081:8081"
     depends_on:
       - db
-    env_file:
-      - ./admin-backend/.env
     volumes:
       - ./admin-backend:/app
       - ../prisma:/app/prisma
@@ -23,8 +21,6 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    env_file:
-      - ./user-backend/.env
     volumes:
       - ./user-backend:/app
       - ../prisma:/app/prisma
