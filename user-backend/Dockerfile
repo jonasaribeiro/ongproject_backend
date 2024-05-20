@@ -14,6 +14,10 @@ RUN npm install
 # Copia o restante dos arquivos
 COPY . .
 
+# Copia e executa o script para criar arquivos .env
+COPY ../create-env-files.sh /app/create-env-files.sh
+RUN chmod +x /app/create-env-files.sh && /app/create-env-files.sh
+
 # Copia o schema do Prisma (caso compartilhado)
 COPY ../prisma ./prisma
 
