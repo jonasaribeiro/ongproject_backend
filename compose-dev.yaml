@@ -13,7 +13,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
-    command: sh -c "npm install"
+    command: sh -c "npm install && tail -f /dev/null"
 
   user-backend:
     build:
@@ -27,7 +27,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
-    command: sh -c "npm install"
+    command: sh -c "npm install && tail -f /dev/null"
 
   db:
     image: postgres:13
