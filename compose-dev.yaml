@@ -9,7 +9,7 @@ services:
       - ./admin-backend:/usr/src/app
       - video-storage:/usr/src/app/videos
     ports:
-      - '3001:3001'
+      - "3001:3001"
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
@@ -25,7 +25,7 @@ services:
       - ./user-backend:/usr/src/app
       - video-storage:/usr/src/app/videos
     ports:
-      - '3002:3002'
+      - "3002:3002"
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
@@ -41,7 +41,7 @@ services:
       - ./admin-backend:/usr/src/admin-backend
       - ./user-backend:/usr/src/user-backend
     ports:
-      - '3003:3003'  # Se precisar de uma porta para algum serviço de edição
+      - "3003:3003"  # Se precisar de uma porta para algum serviço de edição
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
     command: sh -c "tail -f /dev/null"  # Mantém o container rodando para edição
@@ -55,7 +55,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
 volumes:
   db-data:
