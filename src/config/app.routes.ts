@@ -1,18 +1,31 @@
 import express, { Application } from "express";
 import ErrorHandler from "../errors/handleError";
+import VideoController from "../controllers/videoController";
+import path from "path";
 
 const app: Application = express();
 
-app.use(express.json());
+app.set("view engine", "ejs")
+app.set("views", path.join(__dirname, "../views"));
 
-const holder = (_req: any, res: any) => {
-  return res.status(200).json({ message: "Hello World!" });
-};
+app.get("/", (req, res) => {
+    res.render("index");
+});
 
-app.post("", holder)
-app.patch("", holder)
-app.get("", holder)
-app.delete("", holder)
+app.get("/videos/:id", (req, res) => {
+    res.render("videos", { id: req.params.id });
+});
+
+app.use(express.raw());
+app.use(express.static('public'));
+
+app.post("/upload", VideoController.upload)
+app.get("/videos", VideoController.getAll);
+app.get("/videos/:id", VideoController.getDetail);
+app.patch("/videos/:id", VideoController.update);
+app.delete("/videos/:id", VideoController.delete);
+// Apenas para ambiente dev
+app.get("/stream/:id", VideoController.stream)
 
 app.use(ErrorHandler.handle);
 

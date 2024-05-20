@@ -1,7 +1,7 @@
+import prisma from "./config/prisma";
 import "express-async-errors";
 import app from "./config/app.routes";
 import checkEnvironmentVariables, { SERVER_PORT } from "./config/environment";
-import prisma from "./config/prisma";
 
 const main = async () => {
   try {
