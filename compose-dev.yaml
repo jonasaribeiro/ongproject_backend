@@ -56,4 +56,4 @@ services:
 volumes:
   db-data:
   video-storage:
-    # external: true #Comentar linha para testes locais
+    # external: true # Comentar linha para testes locais
