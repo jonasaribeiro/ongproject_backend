@@ -14,9 +14,8 @@ RUN npm install
 # Copia o restante dos arquivos
 COPY . .
 
-# Copia e executa o script para criar arquivos .env
-COPY ../create-env-files.sh /app/create-env-files.sh
-RUN chmod +x /app/create-env-files.sh && /app/create-env-files.sh
+# Criação do arquivo .env durante o build
+RUN echo "NODE_ENV=development\nDATABASE_URL=postgresql://adminuser:ADMINPASSWORD@db:5432/admin_db\nSERVER_PORT=8081" > .env
 
 # Copia o schema do Prisma (caso compartilhado)
 COPY ../prisma ./prisma
