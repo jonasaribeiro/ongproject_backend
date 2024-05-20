@@ -14,8 +14,8 @@ services:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
     command: sh -c "npm install && npm run dev"
-    profiles:
-      - admin
+    deploy:
+      replicas: 0
 
   user-backend:
     build:
@@ -30,8 +30,8 @@ services:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
       - VIDEO_STORAGE_PATH=/usr/src/app/videos
     command: sh -c "npm install && npm run dev"
-    profiles:
-      - user
+    deploy:
+      replicas: 0
 
   dev-editor:
     build:
@@ -40,9 +40,11 @@ services:
     volumes:
       - ./admin-backend:/usr/src/admin-backend
       - ./user-backend:/usr/src/user-backend
+    ports:
+      - '3003:3003'  # Se precisar de uma porta para algum serviço de edição
     environment:
       - DATABASE_URL=postgres://postgres:password@db:5432/mydb
-    command: sh -c "tail -f /dev/null"
+    command: sh -c "tail -f /dev/null"  # Mantém o container rodando para edição
 
   db:
     image: postgres:13
@@ -58,4 +60,4 @@ services:
 volumes:
   db-data:
   video-storage:
-    # external: true  # Comentar linha para testes locais
+    # external: true #Comentar linha para testes locais
