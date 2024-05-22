@@ -1,10 +1,15 @@
 import { EnvironmentVariableError } from "../errors/CustomErrors";
 
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
 const REQUIRED_ENV_VARIABLES = {
-  common: ["DATABASE_URL", "SECRET_KEY", "TOKEN_EXPIRES_IN", "VIDEO_STORAGE_PATH"],
+  common: [
+    "DATABASE_URL",
+    "SECRET_KEY",
+    "TOKEN_EXPIRES_IN",
+    "VIDEO_STORAGE_PATH",
+  ],
   development: [],
   production: [],
   test: [],
@@ -32,7 +37,7 @@ function checkEnvironmentVariables(): void {
 
 export const SERVER_PORT = process.env.SERVER_PORT
   ? parseInt(process.env.SERVER_PORT)
-  : 3000;
+  : 3001;
 
 export const DATABASE_URL = process.env.DATABASE_URL!;
 export const SECRET_KEY = process.env.SECRET_KEY!;

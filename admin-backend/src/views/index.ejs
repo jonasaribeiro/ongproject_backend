@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Video Upload</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Upload a Video</h1>
     <form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="video" accept="video/*" required>
-        <button type="submit">Upload</button>
+      <label for="title">Nome do Filme:</label>
+      <input type="text" id="title" name="title" required />
+      <br /><br />
+      <input type="file" name="video" accept="video/*" required />
+      <br /><br />
+      <button type="submit">Upload</button>
     </form>
 
     <h2>Available Videos</h2>
     <ul id="video-list"></ul>
 
     <script>
-        async function fetchVideos() {
-            const response = await fetch('/videos');
-            const videos = await response.json();
-            const videoList = document.getElementById('video-list');
-            videoList.innerHTML = '';
-            videos.forEach(video => {
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = `/videos/${video.id}`;
-                link.textContent = video.title;
-                link.target = '_blank';
-                listItem.appendChild(link);
-                videoList.appendChild(listItem);
-            });
-        }
+      async function fetchVideos() {
+        const response = await fetch("/videos");
+        const videos = await response.json();
+        const videoList = document.getElementById("video-list");
+        videoList.innerHTML = "";
+        videos.forEach((video) => {
+          const listItem = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = `/videos/${video.id}`;
+          link.textContent = video.title;
+          link.target = "_blank";
+          listItem.appendChild(link);
+          videoList.appendChild(listItem);
+        });
+      }
 
-        fetchVideos();
+      fetchVideos();
     </script>
-</body>
+  </body>
 </html>
