@@ -13,8 +13,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Video {
-  id    Int     @id @default(autoincrement())
-  title String
-  path  String
+model Movie {
+  id             String   @id @default(cuid())
+  title          String   @unique
+  description    String
+  pubDate        DateTime
+  mainPathSD     String?
+  mainPathHD     String?
+  mainPath4K     String?
+  trailersPaths  String[]
+  cartazPaths    String[]
+  thumbnailsPaths String[]
+  promoPaths     String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Serie {
+  id             String   @id @default(cuid())
+  title          String   @unique
+  description    String
+  pubDate        DateTime
+  seasons        Season[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Season {
+  id         String   @id @default(cuid())
+  serieId    String
+  number     Int
+  episodes   Episode[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Serie      Serie   @relation(fields: [serieId], references: [id])
+}
+
+model Episode {
+  id         String   @id @default(cuid())
+  seasonId   String
+  title      String
+  description String
+  mainPathSD String?
+  mainPathHD String?
+  mainPath4K String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Season     Season  @relation(fields: [seasonId], references: [id])
 }

@@ -1,0 +1,39 @@
+{
+  "database": {
+    "Movies": {
+      "TituloDoFilme": {
+        "main": {
+          "SD": "Contém arquivos em resolução SD",
+          "HD": "Contém arquivos em resolução HD",
+          "4K": "Contém arquivos em resolução 4K"
+        },
+        "traillers": "Contém os arquivos de playlist relacionados a traillers",
+        "images": {
+          "promo": "Contem imagens de promoção",
+          "cartaz": "Contem imagens de cartaz",
+          "thumbnails": "Contém miniaturas para exibição"
+        }
+      }
+    },
+
+    "Series": {
+      "TituloDaSérie": {
+        "main": {
+          "Season1": {
+            "Ep01": {
+              "SD": "Contém arquivos em resolução SD",
+              "HD": "Contém arquivos em resolução HD",
+              "4K": "Contém arquivos em resolução 4K"
+            }
+          }
+        },
+        "trailers": "Contém os arquivos de playlist relacionados a traillers",
+        "images": {
+          "promo": "Contem imagens de promoção",
+          "cartaz": "Contem imagens de cartaz",
+          "thumbnails": "Contém miniaturas para exibição"
+        }
+      }
+    }
+  }
+}

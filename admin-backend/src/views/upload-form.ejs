@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Movie</title>
+  </head>
+  <body>
+    <h1>Upload Movie</h1>
+    <form action="/movies/upload" method="POST" enctype="multipart/form-data">
+      <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required />
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+      </div>
+      <div>
+        <label for="pubDate">Publication Date:</label>
+        <input type="date" id="pubDate" name="pubDate" required />
+      </div>
+      <div>
+        <label for="file">Movie File:</label>
+        <input type="file" id="file" name="file" required />
+      </div>
+      <div>
+        <label for="trailers">Trailers:</label>
+        <input type="file" id="trailers" name="trailers" multiple />
+      </div>
+      <div>
+        <label for="images_cartaz">Cartaz Images:</label>
+        <input
+          type="file"
+          id="images_cartaz"
+          name="images_cartaz"
+          multiple
+          required
+        />
+      </div>
+      <div>
+        <label for="images_thumbnails">Thumbnail Images:</label>
+        <input
+          type="file"
+          id="images_thumbnails"
+          name="images_thumbnails"
+          multiple
+          required
+        />
+      </div>
+      <div>
+        <label for="images_promo">Promo Images:</label>
+        <input type="file" id="images_promo" name="images_promo" multiple />
+      </div>
+      <div>
+        <button type="submit">Upload</button>
+      </div>
+    </form>
+  </body>
+</html>

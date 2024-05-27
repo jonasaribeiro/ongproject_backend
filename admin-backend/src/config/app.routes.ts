@@ -1,33 +1,35 @@
 import express, { Application } from "express";
 import ErrorHandler from "../errors/handleError";
-import VideoController from "../controllers/videoController";
 import path from "path";
+import MoviesController from "../controllers/movieController";
+import SeriesController from "../controllers/serieController";
+import { multerUploadMovie } from "./multer";
 
 const app: Application = express();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../views"));
 
-app.get("/", (req, res) => {
-  res.render("index");
-});
-
-app.get("/videos/:id", (req, res) => {
-  res.render("videos", { id: req.params.id });
-});
-
 app.use(express.raw());
 app.use(express.static("public"));
 
-app.post("/upload", VideoController.upload);
-app.get("/videos", VideoController.getAll);
-app.get("/videos/:id", VideoController.getDetail);
-app.patch("/videos/:id", VideoController.update);
-app.delete("/videos/:id", VideoController.delete);
-// Apenas para ambiente dev
+app.get("/upload-form", (req, res) => {
+  res.render("upload-form");
+});
+
+app.post("/movies/upload", multerUploadMovie, MoviesController.upload);
+app.get("/movies", MoviesController.getAll);
+app.get("/movies/:id", MoviesController.getDetail);
+app.patch("/movies/:id", MoviesController.update);
+
+app.post("/series/upload", SeriesController.upload);
+app.get("/series", SeriesController.getAll);
+app.get("/series/:id", SeriesController.getDetail);
+app.patch("/series/:id", SeriesController.update);
+
 app.use(express.json());
-app.get("/stream/:id/:fileName", VideoController.getSegment);
-app.get("/stream/:id", VideoController.getPlaylist);
+app.delete("/movies/:id", MoviesController.delete);
+app.delete("/series/:id", SeriesController.delete);
 
 app.use(ErrorHandler.handle);
 

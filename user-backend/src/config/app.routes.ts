@@ -1,15 +1,26 @@
 import express, { Application } from "express";
 import ErrorHandler from "../errors/handleError";
+import StreamController from "../controllers/streamController";
 
 const app: Application = express();
 
 app.use(express.json());
 
-const holder = (_req: any, res: any) => {
-  return res.status(200).json({ message: "Hello World!" });
-};
-
-app.use("/test", holder);
+app.get("/stream/movie/:id", StreamController.movieGetMaster);
+app.get(
+  "/stream/movie/:id/:resolution/:fileName",
+  StreamController.movieGetFile
+);
+app.get("/stream/serie/:id", StreamController.serieGetMaster);
+app.get(
+  "/stream/serie/:id/:resolution/:fileName",
+  StreamController.serieGetFile
+);
+app.get("/stream/trailer/:id", StreamController.trailerGetMaster);
+app.get(
+  "/stream/trailer/:id/:resolution/:fileName",
+  StreamController.trailerGetFile
+);
 
 app.use(ErrorHandler.handle);
 

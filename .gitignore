@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # video folder
-videos/*
-!videos/placeholder.txt
+database/*
+!database/structure.json

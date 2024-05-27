@@ -13,11 +13,78 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums
-// Models
-model User {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  password String
+model Movie {
+  id             String   @id @default(cuid())
+  title          String   @unique
+  description    String
+  pubDate        DateTime
+  mainPathSD     String?
+  mainPathHD     String?
+  mainPath4K     String?
+  cartazPaths    String[]
+  thumbnailsPaths String[]
+  promoPaths     String[]
+  trailers       MovieTrailer[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model MovieTrailer {
+  id        String   @id @default(cuid())
+  title     String
+  movieId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mainPathSD String?
+  mainPathHD String?
+  mainPath4K String?
+  movie     Movie    @relation(fields: [movieId], references: [id])
+}
+
+model Serie {
+  id             String   @id @default(cuid())
+  title          String   @unique
+  description    String
+  pubDate        DateTime
+  seasons        Season[]
+  trailers       SerieTrailer[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Season {
+  id         String   @id @default(cuid())
+  serieId    String
+  number     Int
+  episodes   Episode[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Serie      Serie   @relation(fields: [serieId], references: [id])
+}
+
+model Episode {
+  id         String   @id @default(cuid())
+  seasonId   String
+  title      String
+  description String
+  mainPathSD String?
+  mainPathHD String?
+  mainPath4K String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Season     Season  @relation(fields: [seasonId], references: [id])
+}
+
+model SerieTrailer {
+  id        String   @id @default(cuid())
+  title     String
+  serieId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mainPathSD String?
+  mainPathHD String?
+  mainPath4K String?
+  serie     Serie    @relation(fields: [serieId], references: [id])
 }
