@@ -47,3 +47,15 @@ export const ValidationError = errorFactory("Falha na validação", 400);
 export const NotFoundError = errorFactory("Recurso não encontrado", 404);
 export const ConflictError = errorFactory("Ocorreu algum conflito", 409);
 export const AuthenticationError = errorFactory("Autenticação falhou", 401);
+export const VideoConversionError = errorFactory(
+  "Failed to convert video to any resolution",
+  500
+);
+export const FfmpegHelperError = errorFactory(
+  "Erro ao obter resolução do vídeo",
+  500
+);
+export const VideoConversionProcessError = errorFactory(
+  "Erro na conversão do vídeo",
+  500
+);

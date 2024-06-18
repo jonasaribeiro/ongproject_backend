@@ -1,6 +1,10 @@
 import { exec } from "child_process";
 import path from "path";
 import fs from "fs";
+import {
+  FfmpegHelperError,
+  VideoConversionProcessError,
+} from "../errors/CustomErrors";
 
 class FfmpegHelper {
   static getVideoResolution = (
@@ -13,9 +17,7 @@ class FfmpegHelper {
         if (error) {
           console.error("Erro no ffprobe:", error);
           console.error("ffprobe stderr:", stderr);
-          return reject(
-            new Error(`Erro ao obter resolução do vídeo: ${stderr}`)
-          );
+          return reject(new FfmpegHelperError(stderr));
         }
 
         const [width, height] = stdout.trim().split("x").map(Number);
@@ -24,16 +26,13 @@ class FfmpegHelper {
     });
   };
 
-  static convertToM3U8 = (
+  static convertVideo = (
     filePath: string,
     resolution: string,
     outputDir: string
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const outputFileName = `${path.basename(
-        filePath,
-        path.extname(filePath)
-      )}_${resolution}.m3u8`.replace("_unprocessed", ""); // Remover _unprocessed do nome do arquivo
+      const outputFileName = `playlistVideo${resolution}.m3u8`;
       const outputPath = path.join(outputDir, outputFileName);
 
       let scaleFilter;
@@ -51,13 +50,14 @@ class FfmpegHelper {
           return reject(new Error("Unknown resolution"));
       }
 
-      const command = `ffmpeg -i "${filePath}" -vf ${scaleFilter} -c:v libx264 -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${outputPath}"`;
+      // Comando para converter vídeo e remover faixa de áudio
+      const command = `ffmpeg -i "${filePath}" -vf ${scaleFilter} -an -c:v libx264 -start_number 0 -hls_time 10 -hls_list_size 0 -hls_segment_filename "${outputDir}/fragmentoVideo${resolution}_%d.ts" -f hls "${outputPath}"`;
 
       exec(command, (error, stdout, stderr) => {
         if (error) {
           console.error("Erro no ffmpeg:", error);
           console.error("ffmpeg stderr:", stderr);
-          return reject(new Error(`Erro na conversão do vídeo: ${stderr}`));
+          return reject(new VideoConversionProcessError(stderr));
         }
         resolve(outputPath); // Retorna o caminho do arquivo convertido
       });
@@ -66,102 +66,57 @@ class FfmpegHelper {
 
   static createMasterM3U8 = (
     outputDir: string,
-    resolutions: { sd: string | null; hd: string | null; _4k: string | null }
+    resolutions: { sd: boolean; hd: boolean; _4k: boolean }
   ) => {
     const masterFilePath = path.join(outputDir, "master.m3u8");
     let masterContent = "#EXTM3U\n";
 
+    masterContent += `
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Audio",DEFAULT=YES,AUTOSELECT=YES,URI=
+${path.relative(outputDir, path.join(outputDir, "audio", "playlistAudio.m3u8"))}
+`;
+
     if (resolutions.sd) {
       masterContent += `
-#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=720x480
-${path.relative(outputDir, resolutions.sd)}
+#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=720x480,AUDIO="audio"
+${path.relative(outputDir, path.join(outputDir, "SD", "playlistVideoSD.m3u8"))}
 `;
     }
 
     if (resolutions.hd) {
       masterContent += `
-#EXT-X-STREAM-INF:BANDWIDTH=2400000,RESOLUTION=1280x720
-${path.relative(outputDir, resolutions.hd)}
+#EXT-X-STREAM-INF:BANDWIDTH=2400000,RESOLUTION=1280x720,AUDIO="audio"
+${path.relative(outputDir, path.join(outputDir, "HD", "playlistVideoHD.m3u8"))}
 `;
     }
 
     if (resolutions._4k) {
       masterContent += `
-#EXT-X-STREAM-INF:BANDWIDTH=8000000,RESOLUTION=3840x2160
-${path.relative(outputDir, resolutions._4k)}
+#EXT-X-STREAM-INF:BANDWIDTH=8000000,RESOLUTION=3840x2160,AUDIO="audio"
+${path.relative(outputDir, path.join(outputDir, "4K", "playlistVideo4K.m3u8"))}
 `;
     }
 
     fs.writeFileSync(masterFilePath, masterContent);
   };
 
-  static extractThumbnail = async (
+  static extractAudio = (
     filePath: string,
     outputDir: string
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const outputFileName =
-        path.basename(filePath, path.extname(filePath)) + ".png";
+      const outputFileName = `playlistAudio.m3u8`;
       const outputPath = path.join(outputDir, outputFileName);
 
-      const command = `ffmpeg -i "${filePath}" -vf "thumbnail" -frames:v 1 "${outputPath}"`;
+      const command = `ffmpeg -i "${filePath}" -q:a 0 -map a -start_number 0 -hls_time 10 -hls_list_size 0 -hls_segment_filename "${outputDir}/fragmentoAudio_%d.ts" -f hls "${outputPath}"`;
 
       exec(command, (error, stdout, stderr) => {
         if (error) {
-          console.error("Error during thumbnail extraction:", error);
+          console.error("Erro no ffmpeg:", error);
           console.error("ffmpeg stderr:", stderr);
-          return reject(
-            new Error(`Error during thumbnail extraction: ${stderr}`)
-          );
+          return reject(new VideoConversionProcessError(stderr));
         }
-        resolve(outputPath);
-      });
-    });
-  };
-
-  static resizeImage = (
-    imagePath: string,
-    width: number,
-    height: number,
-    outputDir: string
-  ): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const outputFileName =
-        path.basename(imagePath, path.extname(imagePath)) +
-        `_${width}x${height}.png`;
-      const outputPath = path.join(outputDir, outputFileName);
-
-      const command = `ffmpeg -i "${imagePath}" -vf "scale=${width}:${height}" "${outputPath}"`;
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          console.error("Error during image resizing:", error);
-          console.error("ffmpeg stderr:", stderr);
-          return reject(new Error(`Error during image resizing: ${stderr}`));
-        }
-        resolve(outputPath);
-      });
-    });
-  };
-
-  static compressImage = (
-    imagePath: string,
-    outputDir: string
-  ): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const outputFileName =
-        path.basename(imagePath, path.extname(imagePath)) + "_compressed.jpg";
-      const outputPath = path.join(outputDir, outputFileName);
-
-      const command = `ffmpeg -i "${imagePath}" -qscale:v 2 "${outputPath}"`;
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          console.error("Error during image compression:", error);
-          console.error("ffmpeg stderr:", stderr);
-          return reject(new Error(`Error during image compression: ${stderr}`));
-        }
-        resolve(outputPath);
+        resolve(outputPath); // Retorna o caminho do arquivo de áudio extraído
       });
     });
   };

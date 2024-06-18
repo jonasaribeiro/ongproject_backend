@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import * as CustomErrors from "./CustomErrors";
 import { ZodError } from "zod";
-import fs from "fs";
 import path from "path";
+import prisma from "../config/prisma";
+import FileHelper from "../utils/fileHelper";
 
 class ErrorHandler {
   private static defaultErrorMapper(err: any) {
@@ -25,20 +26,6 @@ class ErrorHandler {
     }),
   };
 
-  private static async deleteFolderRecursive(folderPath: string) {
-    if (fs.existsSync(folderPath)) {
-      fs.readdirSync(folderPath).forEach((file, index) => {
-        const curPath = path.join(folderPath, file);
-        if (fs.lstatSync(curPath).isDirectory()) {
-          ErrorHandler.deleteFolderRecursive(curPath); // Recursively delete folder
-        } else {
-          fs.unlinkSync(curPath); // Delete file
-        }
-      });
-      fs.rmdirSync(folderPath); // Remove directory
-    }
-  }
-
   static async handle(
     err: Error,
     req: Request,
@@ -54,17 +41,25 @@ class ErrorHandler {
     console.log(`status: ${status}`);
     console.log(`message: ${message}`);
 
-    console.log("Verificando se há arquivos a ser deletado");
-    const title = req.body.title?.replace(/\s+/g, "_");
-    if (title) {
+    const movieId = (req as any).movieId;
+
+    if (movieId) {
+      console.log("Verificando se há arquivos a ser deletado");
       const folderPath = path.join(
         __dirname,
         "../../../database/movies",
-        title
+        movieId
       );
+
+      // Delete folder
       console.log("Deletando pasta " + folderPath);
-      await ErrorHandler.deleteFolderRecursive(folderPath);
+      await FileHelper.deleteFolderRecursive(folderPath);
       console.log("Pasta deletada");
+
+      // Delete movie from the database
+      console.log("Deletando filme do banco de dados");
+      await prisma.movie.delete({ where: { id: movieId } });
+      console.log("Filme deletado do banco de dados");
     }
 
     return res.status(status).json({ message });

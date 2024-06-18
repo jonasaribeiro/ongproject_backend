@@ -3,8 +3,8 @@ import MovieService from "../services/movieService";
 
 class MoviesController {
   static upload = async (req: Request, res: Response) => {
-    console.log("MoviesController - Iniciou");
-    const result = await MovieService.upload(req, res);
+    const movieId = await MovieService.createMovieEntity(req.body);
+    const result = await MovieService.uploadFiles(req, res, movieId);
     res.status(201).json(result);
   };
 

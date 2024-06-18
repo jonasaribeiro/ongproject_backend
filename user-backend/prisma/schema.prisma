@@ -14,31 +14,18 @@ datasource db {
 }
 
 model Movie {
-  id             String   @id @default(cuid())
-  title          String   @unique
-  description    String
-  pubDate        DateTime
-  mainPathSD     String?
-  mainPathHD     String?
-  mainPath4K     String?
-  cartazPaths    String[]
-  thumbnailsPaths String[]
-  promoPaths     String[]
-  trailers       MovieTrailer[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id          String             @id @default(uuid())
+  title       String
+  description String
+  pubDate     DateTime
+  audioPath   String?
+  resolutions MovieResolution[]  @relation("MovieResolutions")
 }
 
-model MovieTrailer {
-  id        String   @id @default(cuid())
-  title     String
-  movieId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  mainPathSD String?
-  mainPathHD String?
-  mainPath4K String?
-  movie     Movie    @relation(fields: [movieId], references: [id])
+model MovieResolution {
+  id     String    @id @default(uuid())
+  name   String    @unique
+  movies Movie[]   @relation("MovieResolutions")
 }
 
 model Serie {
@@ -47,7 +34,6 @@ model Serie {
   description    String
   pubDate        DateTime
   seasons        Season[]
-  trailers       SerieTrailer[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
@@ -75,16 +61,4 @@ model Episode {
   updatedAt  DateTime @updatedAt
 
   Season     Season  @relation(fields: [seasonId], references: [id])
-}
-
-model SerieTrailer {
-  id        String   @id @default(cuid())
-  title     String
-  serieId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  mainPathSD String?
-  mainPathHD String?
-  mainPath4K String?
-  serie     Serie    @relation(fields: [serieId], references: [id])
 }

@@ -1,18 +1,22 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "Movie" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "pubDate" TIMESTAMP(3) NOT NULL,
+    "audioPath" TEXT,
 
-  - You are about to drop the column `mainPath` on the `Movie` table. All the data in the column will be lost.
-  - You are about to drop the `Series` table. If the table is not empty, all the data it contains will be lost.
+    CONSTRAINT "Movie_pkey" PRIMARY KEY ("id")
+);
 
-*/
--- AlterTable
-ALTER TABLE "Movie" DROP COLUMN "mainPath",
-ADD COLUMN     "mainPath4K" TEXT,
-ADD COLUMN     "mainPathHD" TEXT,
-ADD COLUMN     "mainPathSD" TEXT;
+-- CreateTable
+CREATE TABLE "MovieResolution" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "movieId" TEXT NOT NULL,
 
--- DropTable
-DROP TABLE "Series";
+    CONSTRAINT "MovieResolution_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Serie" (
@@ -54,6 +58,9 @@ CREATE TABLE "Episode" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Serie_title_key" ON "Serie"("title");
+
+-- AddForeignKey
+ALTER TABLE "MovieResolution" ADD CONSTRAINT "MovieResolution_movieId_fkey" FOREIGN KEY ("movieId") REFERENCES "Movie"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Season" ADD CONSTRAINT "Season_serieId_fkey" FOREIGN KEY ("serieId") REFERENCES "Serie"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

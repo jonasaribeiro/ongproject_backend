@@ -7,23 +7,13 @@ import { IMulterUploadFiles } from "../types/movieTypes";
 // Caminho absoluto para a pasta "database" durante desenvolvimento
 export const databasePath = path.resolve(__dirname, "../../../database");
 
+const unprocessedPath = path.join(databasePath, "unprocessed");
+
 const movieStorage = multer.diskStorage({
   destination: function (req: Request, file, cb) {
-    const title = req.body.title.replace(/\s+/g, "_");
-    let folderPath = path.join(databasePath, "movies", title);
-
-    if (file.fieldname === "file") {
-      folderPath = path.join(folderPath, "main");
-    } else if (file.fieldname === "images_cartaz") {
-      folderPath = path.join(folderPath, "images", "cartaz");
-    } else if (file.fieldname === "images_thumbnails") {
-      folderPath = path.join(folderPath, "images", "thumbnails");
-    } else if (file.fieldname === "images_promo") {
-      folderPath = path.join(folderPath, "images", "promo");
-    }
-
-    fs.mkdirSync(folderPath, { recursive: true });
-    cb(null, folderPath);
+    // Garantindo que a pasta unprocessed exista
+    fs.mkdirSync(unprocessedPath, { recursive: true });
+    cb(null, unprocessedPath);
   },
   filename: function (req: Request, file, cb) {
     let suffix = "";
@@ -44,16 +34,9 @@ const movieStorage = multer.diskStorage({
 
 const trailerStorage = multer.diskStorage({
   destination: function (req: Request, file, cb) {
-    const movieTitle = req.body.movieTitle.replace(/\s+/g, "_");
-    const folderPath = path.join(
-      databasePath,
-      "movies",
-      movieTitle,
-      "trailers"
-    );
-
-    fs.mkdirSync(folderPath, { recursive: true });
-    cb(null, folderPath);
+    // Garantindo que a pasta unprocessed exista
+    fs.mkdirSync(unprocessedPath, { recursive: true });
+    cb(null, unprocessedPath);
   },
   filename: function (req: Request, file, cb) {
     const trailerFiles = (req.files as IMulterUploadFiles)?.trailers || [];
