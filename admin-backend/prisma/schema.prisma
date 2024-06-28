@@ -13,52 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Movie Models
 model Movie {
-  id          String             @id @default(uuid())
+  id          String            @id @default(uuid())
   title       String
   description String
-  pubDate     DateTime
-  audioPath   String?
-  resolutions MovieResolution[]  @relation("MovieResolutions")
+  pubYear     String
+  genres MovieGenre[] @relation("MovieGenres")
+  resolutions MovieResolution[] @relation("MovieResolutions")
+  ageRatingId String?
+  ageRating   MovieAgeRating?        @relation("MovieAgeRatings", fields: [ageRatingId], references: [id])
 }
 
 model MovieResolution {
-  id     String    @id @default(uuid())
-  name   String    @unique
-  movies Movie[]   @relation("MovieResolutions")
+  id     String  @id @default(uuid())
+  name   String  @unique
+  movies Movie[] @relation("MovieResolutions")
 }
 
-model Serie {
-  id             String   @id @default(cuid())
-  title          String   @unique
-  description    String
-  pubDate        DateTime
-  seasons        Season[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+model MovieAgeRating {
+  id          String  @id @default(uuid())
+  description String @unique
+  movies      Movie[] @relation("MovieAgeRatings")
 }
 
-model Season {
-  id         String   @id @default(cuid())
-  serieId    String
-  number     Int
-  episodes   Episode[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  Serie      Serie   @relation(fields: [serieId], references: [id])
-}
-
-model Episode {
-  id         String   @id @default(cuid())
-  seasonId   String
-  title      String
-  description String
-  mainPathSD String?
-  mainPathHD String?
-  mainPath4K String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  Season     Season  @relation(fields: [seasonId], references: [id])
+model MovieGenre {
+  id String @id @default(uuid())
+  name String @unique
+  movies Movie[] @relation("MovieGenres")
 }

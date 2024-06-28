@@ -17,12 +17,52 @@
         <textarea id="description" name="description" required></textarea>
       </div>
       <div>
-        <label for="pubDate">Publication Date:</label>
-        <input type="date" id="pubDate" name="pubDate" required />
+        <label for="pubYear">Publication Year:</label>
+        <input
+          type="number"
+          id="pubYear"
+          name="pubYear"
+          min="1888"
+          max="2100"
+          required
+        />
+      </div>
+      <div>
+        <label for="ageRating">Age Rating:</label>
+        <select id="ageRating" name="ageRating" required>
+          <option value="">Select Age Rating</option>
+          <!-- Exemplo de opções; estas devem ser dinâmicas -->
+          <option value="G">G</option>
+          <option value="PG">PG</option>
+          <option value="PG-13">PG-13</option>
+          <option value="R">R</option>
+          <option value="NC-17">NC-17</option>
+        </select>
+      </div>
+      <div>
+        <label for="genres">Genres:</label>
+        <select id="genres" name="genres" multiple required>
+          <!-- Exemplo de opções; estas devem ser dinâmicas -->
+          <option value="action">Action</option>
+          <option value="comedy">Comedy</option>
+          <option value="drama">Drama</option>
+          <option value="fantasy">Fantasy</option>
+          <option value="horror">Horror</option>
+        </select>
       </div>
       <div>
         <label for="file">Movie File:</label>
         <input type="file" id="file" name="file" required />
+      </div>
+      <div>
+        <label for="poster">Poster Image:</label>
+        <input
+          type="file"
+          id="poster"
+          name="poster"
+          accept="image/*"
+          required
+        />
       </div>
       <div>
         <button type="submit">Upload</button>

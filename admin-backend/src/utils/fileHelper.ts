@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs";
+import fsPromises from "fs/promises";
 import FfmpegHelper from "./ffmpegHelper";
+import sharp from "sharp";
 
 class FileHelper {
   static createDirectory = (dir: string): void => {
@@ -13,9 +15,36 @@ class FileHelper {
     fs.renameSync(originalPath, newFilePath);
   };
 
-  static deleteFile = (filePath: string): void => {
+  static deleteTempMovie = async (filePath: string): Promise<void> => {
     if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+      await fsPromises.unlink(filePath);
+      console.log(
+        `Arquivo de filme temporário excluído com sucesso: ${filePath}`
+      );
+    } else {
+      console.warn(`Arquivo de filme temporário não encontrado: ${filePath}`);
+    }
+  };
+
+  static deleteTempPoster = async (filePath: string): Promise<void> => {
+    try {
+      if (fs.existsSync(filePath)) {
+        console.log(`Tentando deletar arquivo de poster: ${filePath}`);
+        const stats = await fsPromises.stat(filePath);
+        console.log(
+          `Permissões do arquivo de poster antes de deletar: ${stats.mode}`
+        );
+        await fsPromises.unlink(filePath);
+        console.log(
+          `Arquivo de poster temporário excluído com sucesso: ${filePath}`
+        );
+      } else {
+        console.warn(
+          `Arquivo de poster temporário não encontrado: ${filePath}`
+        );
+      }
+    } catch (err) {
+      console.error(`Erro ao tentar deletar o arquivo ${filePath}:`, err);
     }
   };
 
@@ -58,8 +87,6 @@ class FileHelper {
       resolutions.sd = true;
 
       FfmpegHelper.createMasterM3U8(newDir, resolutions);
-
-      // Não é mais necessário excluir o arquivo original aqui, pois será feito no uploadFiles
     }
 
     return resolutions;
@@ -83,6 +110,35 @@ class FileHelper {
         }
       });
       fs.rmdirSync(folderPath); // Remove directory
+    }
+  };
+
+  static optimizeImage = async (
+    originalPath: string,
+    outputPath: string
+  ): Promise<void> => {
+    try {
+      await sharp(originalPath)
+        .resize(500, 750) // Exemplo de redimensionamento, ajuste conforme necessário
+        .jpeg({ quality: 80 }) // Configuração de qualidade da imagem otimizada
+        .toFile(outputPath);
+
+      // Garantir que o arquivo original não está em uso
+      try {
+        const fileHandle = await fsPromises.open(originalPath, "r+");
+        await fileHandle.close();
+      } catch (err) {
+        console.error(`Erro ao abrir o arquivo ${originalPath}:`, err);
+      }
+
+      const stats = await fsPromises.stat(originalPath);
+      console.log(
+        `Permissões do arquivo de poster antes de deletar: ${stats.mode}`
+      );
+
+      await FileHelper.deleteTempPoster(originalPath);
+    } catch (err) {
+      console.error(`Erro durante a otimização da imagem:`, err);
     }
   };
 }
