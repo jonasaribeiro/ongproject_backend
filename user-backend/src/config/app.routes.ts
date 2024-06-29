@@ -27,6 +27,7 @@ app.get(
   "/movies/genre/:genre/ageRating/:ageRating",
   MoviesController.getMoviesByGenreAndAgeRating
 );
+app.get("/movies/:movieId/poster");
 
 // Rota Para Filtrar por genero
 //

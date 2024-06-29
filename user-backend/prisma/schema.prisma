@@ -33,7 +33,7 @@ model MovieResolution {
 
 model MovieAgeRating {
   id          String  @id @default(uuid())
-  description String
+  description String @unique
   movies      Movie[] @relation("MovieAgeRatings")
 }
 

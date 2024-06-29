@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import MovieService from "../services/moviesService";
+import path from "path";
 
 class MoviesController {
   static async getMovies(req: Request, res: Response) {
@@ -40,6 +41,18 @@ class MoviesController {
       Number(pageSize)
     );
     res.json(movies);
+  }
+
+  static async getMoviePoster(req: Request, res: Response) {
+    const { movieId } = req.params;
+    const imagePath = await MovieService.getMoviePosterPath(movieId);
+
+    if (!imagePath) {
+      res.status(404).json({ error: "Poster not found" });
+      return;
+    }
+
+    res.sendFile(imagePath);
   }
 }
 
