@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,26 +13,67 @@ model Movie {
   title       String
   description String
   pubYear     String
-  genres MovieGenre[] @relation("MovieGenres")
+  categories  Category[]        @relation("MovieCategories")
   resolutions MovieResolution[] @relation("MovieResolutions")
   ageRatingId String?
-  ageRating   MovieAgeRating?        @relation("MovieAgeRatings", fields: [ageRatingId], references: [id])
+  ageRating   AgeRating?        @relation("MovieAgeRatings", fields: [ageRatingId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  active      Boolean           @default(false)
 }
 
+// Serie Models
+model Serie {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  releaseYear String
+  seasons     Season[]
+  categories  Category[] @relation("SerieCategories")
+  ageRatingId String?
+  ageRating   AgeRating? @relation("SerieAgeRatings", fields: [ageRatingId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  active      Boolean    @default(false)
+}
+
+model Season {
+  id           String    @id @default(uuid())
+  serieId      String
+  serie        Serie     @relation(fields: [serieId], references: [id])
+  seasonNumber Int
+  episodes     Episode[]
+  active       Boolean   @default(false)
+}
+
+model Episode {
+  id            String @id @default(uuid())
+  title         String
+  description   String
+  seasonId      String
+  season        Season @relation(fields: [seasonId], references: [id])
+  episodeNumber Int
+}
+
+// Resolution Models
 model MovieResolution {
   id     String  @id @default(uuid())
   name   String  @unique
   movies Movie[] @relation("MovieResolutions")
 }
 
-model MovieAgeRating {
-  id          String  @id @default(uuid())
-  description String @unique
-  movies      Movie[] @relation("MovieAgeRatings")
+// Age Rating Models
+model AgeRating {
+  id     String  @id @default(uuid())
+  name   String  @unique
+  movies Movie[] @relation("MovieAgeRatings")
+  series Serie[] @relation("SerieAgeRatings")
 }
 
-model MovieGenre {
-  id String @id @default(uuid())
-  name String @unique
-  movies Movie[] @relation("MovieGenres")
+// Category Models
+model Category {
+  id     String  @id @default(uuid())
+  name   String  @unique
+  movies Movie[] @relation("MovieCategories")
+  series Serie[] @relation("SerieCategories")
 }

@@ -1,22 +1,19 @@
 import { Request, Response } from "express";
-import path from "path";
 import prisma from "../config/prisma";
 import { ValidationError } from "../errors/CustomErrors";
-import { databasePath } from "../config/multer";
-import { IMulterUploadFiles } from "../types/movieTypes";
-import FileHelper from "../utils/fileHelper";
+import MediaServiceHelper from "../utils/mediaServiceHelper";
 
-class MoviesService {
+class MovieService {
   static createMovieEntity = async (data: {
     title: string;
     description: string;
     pubYear: string;
-    genres: { name: string }[];
-    ageRating: { description: string };
+    categories: { name: string }[];
+    ageRating: { name: string };
   }): Promise<string> => {
     console.log("Dados recebidos no createMovieEntity:", data);
 
-    const { title, description, pubYear, genres, ageRating } = data;
+    const { title, description, pubYear, categories, ageRating } = data;
 
     if (!title) {
       throw new ValidationError("Title is required");
@@ -26,31 +23,31 @@ class MoviesService {
       throw new ValidationError("Publication year is required");
     }
 
-    if (!ageRating || !ageRating.description) {
+    if (!ageRating || !ageRating.name) {
       throw new ValidationError("Age rating is required");
     }
 
-    if (!genres || genres.length === 0) {
+    if (!categories || categories.length === 0) {
       throw new ValidationError("At least one genre is required");
     }
 
     // Upsert age rating
-    const movieAgeRating = await prisma.movieAgeRating.upsert({
-      where: { description: ageRating.description },
+    const movieAgeRating = await prisma.ageRating.upsert({
+      where: { name: ageRating.name },
       update: {},
-      create: { description: ageRating.description },
+      create: { name: ageRating.name },
     });
 
     // Upsert genres
-    const genrePromises = genres.map(async (genre) => {
-      return await prisma.movieGenre.upsert({
-        where: { name: genre.name },
+    const categoriesPromises = categories.map(async (category) => {
+      return await prisma.category.upsert({
+        where: { name: category.name },
         update: {},
-        create: { name: genre.name },
+        create: { name: category.name },
       });
     });
 
-    const genreResults = await Promise.all(genrePromises);
+    const categoriesResults = await Promise.all(categoriesPromises);
 
     // Create movie with relationships
     const movie = await prisma.movie.create({
@@ -61,8 +58,8 @@ class MoviesService {
         ageRating: {
           connect: { id: movieAgeRating.id },
         },
-        genres: {
-          connect: genreResults.map((genre) => ({ id: genre.id })),
+        categories: {
+          connect: categoriesResults.map((category) => ({ id: category.id })),
         },
       },
     });
@@ -74,28 +71,7 @@ class MoviesService {
     posterFile: Express.Multer.File,
     movieDir: string
   ): Promise<void> {
-    const unprocessedDir = path.join(databasePath, "unprocessed");
-    FileHelper.createDirectory(unprocessedDir);
-
-    const imagesDir = path.join(movieDir, "images");
-    FileHelper.createDirectory(imagesDir);
-
-    let posterFilePath = "";
-    if (posterFile) {
-      posterFilePath = path.join(
-        unprocessedDir,
-        Date.now() + "_" + posterFile.originalname
-      );
-      await FileHelper.moveFile(posterFile.path, posterFilePath);
-
-      // Optimize and move the poster file to the images directory
-      const optimizedPosterPath = path.join(imagesDir, "poster.jpg");
-      await FileHelper.optimizeImage(posterFilePath, optimizedPosterPath);
-
-      // Delete the temporary file after processing
-      console.log(`Tentando deletar poster temporário: ${posterFilePath}`);
-      await FileHelper.deleteTempPoster(posterFilePath);
-    }
+    return MediaServiceHelper.uploadPoster(posterFile, movieDir);
   }
 
   static async uploadMovie(
@@ -104,53 +80,34 @@ class MoviesService {
     movieDir: string,
     mainDir: string
   ): Promise<void> {
-    const unprocessedDir = path.join(databasePath, "unprocessed");
-    FileHelper.createDirectory(unprocessedDir);
+    const resolutions = await MediaServiceHelper.processMediaFile(
+      mainFile,
+      movieDir,
+      mainDir
+    );
 
-    let tempFilePath = "";
-    if (mainFile) {
-      tempFilePath = path.join(
-        unprocessedDir,
-        Date.now() + "_" + mainFile.originalname
-      );
-      await FileHelper.moveFile(mainFile.path, tempFilePath);
+    // Atualiza resoluções no banco de dados
+    const resolutionNames: string[] = [];
+    if (resolutions.sd) resolutionNames.push("SD");
+    if (resolutions.hd) resolutionNames.push("HD");
+    if (resolutions._4k) resolutionNames.push("4K");
 
-      const resolutions = await FileHelper.processVideoFile(
-        { path: tempFilePath, originalname: mainFile.originalname },
-        movieDir,
-        "main"
-      );
+    // Buscar ou criar resoluções e vincular ao filme
+    for (const name of resolutionNames) {
+      const resolution = await prisma.movieResolution.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
 
-      const audioDir = path.join(mainDir, "audio");
-      FileHelper.createDirectory(audioDir);
-      await FileHelper.extractAudio(tempFilePath, audioDir);
-
-      // Delete the temporary file after processing
-      await FileHelper.deleteTempMovie(tempFilePath);
-
-      // Atualiza resoluções no banco de dados
-      const resolutionNames: string[] = [];
-      if (resolutions.sd) resolutionNames.push("SD");
-      if (resolutions.hd) resolutionNames.push("HD");
-      if (resolutions._4k) resolutionNames.push("4K");
-
-      // Buscar ou criar resoluções e vincular ao filme
-      for (const name of resolutionNames) {
-        const resolution = await prisma.movieResolution.upsert({
-          where: { name },
-          update: {},
-          create: { name },
-        });
-
-        await prisma.movie.update({
-          where: { id: movieId },
-          data: {
-            resolutions: {
-              connect: { id: resolution.id },
-            },
+      await prisma.movie.update({
+        where: { id: movieId },
+        data: {
+          resolutions: {
+            connect: { id: resolution.id },
           },
-        });
-      }
+        },
+      });
     }
   }
 
@@ -159,39 +116,48 @@ class MoviesService {
     res: Response,
     movieId: string
   ): Promise<any> {
-    if (!req.files) {
-      throw new ValidationError("Files are missing");
-    }
+    const result = await MediaServiceHelper.uploadFiles(
+      req,
+      res,
+      movieId,
+      "movie"
+    );
 
-    const { title } = req.body;
-    if (!title) {
-      throw new ValidationError("Title is required");
-    }
+    // Atualiza resoluções no banco de dados
+    const resolutionNames: string[] = [];
+    if (result.resolutions.sd) resolutionNames.push("SD");
+    if (result.resolutions.hd) resolutionNames.push("HD");
+    if (result.resolutions._4k) resolutionNames.push("4K");
 
-    const movieDir = path.join(databasePath, "movies", movieId);
-    const mainDir = path.join(movieDir, "main");
-    FileHelper.createDirectory(movieDir);
-    FileHelper.createDirectory(mainDir);
+    // Buscar ou criar resoluções e vincular ao filme
+    for (const name of resolutionNames) {
+      const resolution = await prisma.movieResolution.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
 
-    (req as any).movieDir = movieDir;
-    (req as any).movieId = movieId;
-
-    const files = req.files as IMulterUploadFiles;
-    const mainFile = files.file ? files.file[0] : null;
-    const posterFile = files.poster ? files.poster[0] : null;
-
-    if (posterFile) {
-      await MoviesService.uploadPoster(posterFile, movieDir);
-    }
-
-    if (mainFile) {
-      await MoviesService.uploadMovie(mainFile, movieId, movieDir, mainDir);
+      await prisma.movie.update({
+        where: { id: movieId },
+        data: {
+          resolutions: {
+            connect: { id: resolution.id },
+          },
+        },
+      });
     }
 
     return {
       message: "Files uploaded successfully",
     };
   }
+
+  static async activateMovie(movieId: string): Promise<void> {
+    await prisma.movie.update({
+      where: { id: movieId },
+      data: { active: true },
+    });
+  }
 }
 
-export default MoviesService;
+export default MovieService;
