@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import MovieService from "../services/moviesService";
-import path from "path";
 
 class MoviesController {
   static async getMovies(req: Request, res: Response) {
@@ -9,11 +8,11 @@ class MoviesController {
     res.json(movies);
   }
 
-  static async getMoviesByGenre(req: Request, res: Response) {
-    const { genre } = req.params;
+  static async getMoviesByCategory(req: Request, res: Response) {
+    const { category } = req.params;
     const { page = 1, pageSize = 10 } = req.query;
-    const movies = await MovieService.getMoviesByGenre(
-      genre,
+    const movies = await MovieService.getMoviesByCategory(
+      category,
       Number(page),
       Number(pageSize)
     );
@@ -31,11 +30,11 @@ class MoviesController {
     res.json(movies);
   }
 
-  static async getMoviesByGenreAndAgeRating(req: Request, res: Response) {
-    const { genre, ageRating } = req.params;
+  static async getMoviesByCategoryAndAgeRating(req: Request, res: Response) {
+    const { category, ageRating } = req.params;
     const { page = 1, pageSize = 10 } = req.query;
-    const movies = await MovieService.getMoviesByGenreAndAgeRating(
-      genre,
+    const movies = await MovieService.getMoviesByCategoryAndAgeRating(
+      category,
       ageRating,
       Number(page),
       Number(pageSize)

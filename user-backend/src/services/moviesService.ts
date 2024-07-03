@@ -12,13 +12,17 @@ class MovieService {
     return movies;
   }
 
-  static async getMoviesByGenre(genre: string, page: number, pageSize: number) {
+  static async getMoviesByCategory(
+    category: string,
+    page: number,
+    pageSize: number
+  ) {
     const skip = (page - 1) * pageSize;
     const movies = await prisma.movie.findMany({
       where: {
-        genres: {
+        categories: {
           some: {
-            name: genre,
+            name: category,
           },
         },
       },
@@ -37,7 +41,7 @@ class MovieService {
     const movies = await prisma.movie.findMany({
       where: {
         ageRating: {
-          description: ageRating,
+          name: ageRating,
         },
       },
       skip,
@@ -46,8 +50,8 @@ class MovieService {
     return movies;
   }
 
-  static async getMoviesByGenreAndAgeRating(
-    genre: string,
+  static async getMoviesByCategoryAndAgeRating(
+    category: string,
     ageRating: string,
     page: number,
     pageSize: number
@@ -55,13 +59,13 @@ class MovieService {
     const skip = (page - 1) * pageSize;
     const movies = await prisma.movie.findMany({
       where: {
-        genres: {
+        categories: {
           some: {
-            name: genre,
+            name: category,
           },
         },
         ageRating: {
-          description: ageRating,
+          name: ageRating,
         },
       },
       skip,
