@@ -55,4 +55,4 @@ class MoviesController {
   }
 }
 
-export default MoviesController;
+export { MoviesController };
