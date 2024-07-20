@@ -13,6 +13,5 @@ export * from "./restrictions";
 export * from "./serie";
 export * from "./season";
 export * from "./user";
-export * from "./watching";
 export * from "./watchingMovie";
 export * from "./watchingSerie";

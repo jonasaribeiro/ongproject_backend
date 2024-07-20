@@ -8,7 +8,7 @@ class RestrictionController {
   };
 
   static getAll = async (req: Request, res: Response) => {
-    const profileId = req.params.id;
+    const profileId = req.params.profileId;
     const restrictions = await RestrictionService.getAll(profileId);
 
     res.status(200).json(restrictions);

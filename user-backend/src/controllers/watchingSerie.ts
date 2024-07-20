@@ -22,4 +22,4 @@ class WatchingSerieController {
   };
 }
 
-export default WatchingSerieController;
+export { WatchingSerieController };

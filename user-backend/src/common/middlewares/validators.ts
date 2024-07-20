@@ -18,7 +18,7 @@ class Validators {
     };
   };
 
-  static token = async (
+  static tokenIsValid = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -42,6 +42,17 @@ class Validators {
     const role: string = res.locals.role;
 
     if (role !== "admin") {
+      throw new AppError("Unauthorized", 401);
+    }
+
+    return next();
+  };
+
+  static isUser = (req: Request, res: Response, next: NextFunction) => {
+    const userIdToken: string = res.locals.userId;
+    const userIdParam: string = req.params.id;
+
+    if (userIdParam !== userIdToken) {
       throw new AppError("Unauthorized", 401);
     }
 
@@ -93,4 +104,4 @@ class Validators {
   };
 }
 
-export default Validators;
+export { Validators };

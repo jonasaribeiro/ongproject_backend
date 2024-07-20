@@ -8,7 +8,7 @@ class WatchingMovieController {
   };
 
   static getAll = async (req: Request, res: Response) => {
-    const profileId = req.params.id;
+    const profileId = req.params.profileId;
     const watchingMovies = await WatchingMovieService.getAll(profileId);
 
     res.status(200).json(watchingMovies);

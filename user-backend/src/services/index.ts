@@ -7,6 +7,7 @@ export * from "./login";
 export * from "./myList";
 export * from "./movie";
 export * from "./profile";
+export * from "./preference";
 export * from "./resolution";
 export * from "./restriction";
 export * from "./season";
