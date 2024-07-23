@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import prisma from "../config/prisma";
 
 class MovieService {
+  /*
   static async getMovies(page: number, pageSize: number) {
     const skip = (page - 1) * pageSize;
     const movies = await prisma.movie.findMany({
@@ -73,7 +74,7 @@ class MovieService {
     });
     return movies;
   }
-
+*/
   static async getMoviePosterPath(movieId: string): Promise<string | null> {
     const imagePath = path.join(
       __dirname,

@@ -14,7 +14,7 @@ restrictionRouter.post(
 );
 
 restrictionRouter.get(
-  "/:id",
+  "/:profileId",
   Validators.tokenIsValid,
   RestrictionController.getAll
 );
