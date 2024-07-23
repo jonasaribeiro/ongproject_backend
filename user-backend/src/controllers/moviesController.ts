@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import MovieService from "../services/moviesService";
 
 class MoviesController {
+  /*
   static async getMovies(req: Request, res: Response) {
     const { page = 1, pageSize = 10 } = req.query;
     const movies = await MovieService.getMovies(Number(page), Number(pageSize));
@@ -41,6 +42,7 @@ class MoviesController {
     );
     res.json(movies);
   }
+   */
 
   static async getMoviePoster(req: Request, res: Response) {
     const { movieId } = req.params;
@@ -55,4 +57,4 @@ class MoviesController {
   }
 }
 
-export default MoviesController;
+export { MoviesController };

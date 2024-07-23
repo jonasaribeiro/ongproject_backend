@@ -1,11 +1,13 @@
 import { ZodTypeAny } from "zod";
 import { Request, Response, NextFunction } from "express";
 import {
+  AppError,
   AuthenticationError,
   ExpiredTokenError,
 } from "../../errors/CustomErrors";
 import { TokenExpiredError, verify } from "jsonwebtoken";
 import { SECRET_KEY } from "../../config/environment";
+import prisma from "../../config/prisma";
 
 class Validators {
   static bodyIsValid = (schema: ZodTypeAny) => {
@@ -16,7 +18,7 @@ class Validators {
     };
   };
 
-  static token = async (
+  static tokenIsValid = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -30,10 +32,76 @@ class Validators {
         throw new ExpiredTokenError(error.message, error.expiredAt);
       if (error) throw new AuthenticationError("Token inválido");
 
-      res.locals.id = decoded.sub;
+      res.locals.userId = decoded.userId;
+      res.locals.role = decoded.role;
     });
+    return next();
+  };
+
+  static isAdmin = (req: Request, res: Response, next: NextFunction) => {
+    const role: string = res.locals.role;
+
+    if (role !== "admin") {
+      throw new AppError("Unauthorized", 401);
+    }
+
+    return next();
+  };
+
+  static isUser = (req: Request, res: Response, next: NextFunction) => {
+    const userIdToken: string = res.locals.userId;
+    const userIdParam: string = req.params.id;
+
+    if (userIdParam !== userIdToken) {
+      throw new AppError("Unauthorized", 401);
+    }
+
+    return next();
+  };
+
+  static profileIdBody = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const userIdToken: string = res.locals.userId;
+    const { profile_id } = req.body;
+
+    const profile = await prisma.profile.findUniqueOrThrow({
+      where: { id: profile_id },
+    });
+
+    if (profile.userId != userIdToken) {
+      throw new AppError(
+        "You are trying to modify data from a profile that is not yours",
+        409
+      );
+    }
+    res.locals.profileId = profile.id;
+    return next();
+  };
+
+  static profileIdParams = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const userIdToken: string = res.locals.userId;
+    const profile_id = req.params.id;
+
+    const profile = await prisma.profile.findUniqueOrThrow({
+      where: { id: profile_id },
+    });
+
+    if (profile.userId != userIdToken) {
+      throw new AppError(
+        "You are trying to modify data from a profile that is not yours",
+        409
+      );
+    }
+    res.locals.profileId = profile.id;
     return next();
   };
 }
 
-export default Validators;
+export { Validators };
