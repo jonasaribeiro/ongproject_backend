@@ -37,12 +37,6 @@ app.use(express.json());
 app.get("/stream/movie/:id/master.m3u8", StreamController.movieGetMaster);
 app.get("/stream/movie/:id/:folder/:fileName", StreamController.movieGetFile);
 
-//app.get("/movies", MoviesController.getMovies);
-//app.get("/movies/category/:category", MoviesController.getMoviesByCategory);
-//app.get("/movies/ageRating/:ageRating", MoviesController.getMoviesByAgeRating);
-//app.get("/movies/category/:category/ageRating/:ageRating",MoviesController.getMoviesByCategoryAndAgeRating);
-app.get("/movies/:movieId/poster");
-
 app.use("/user", userRouter);
 app.use("/user/profile", profileRouter);
 app.use("/user/profile/restriction", restrictionRouter);
@@ -58,14 +52,10 @@ app.use("/category", categoryRouter);
 app.use("/ageRating", ageRatingRouter);
 
 app.use("/movie", movieRouter);
+app.get("/movie/:movieId/poster");
 app.use("/serie", serieRouter);
 app.use("/serie/:serieId/season", seasonRouter);
 app.use("/serie/:serieId/season/:seasonId/episode", episodeRouter);
-
-// Rota Para Filtrar por genero
-//
-// Rota para Filtrar aleatórios
-//
 
 app.use(ErrorHandler.handle);
 
