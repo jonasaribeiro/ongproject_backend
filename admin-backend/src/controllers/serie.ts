@@ -4,6 +4,8 @@ import { SerieService } from "../services/serie";
 class SerieController {
   static register = async (req: Request, res: Response) => {
     const serie = await SerieService.create(req.body);
+
+    await SerieService.uploadPoster(req, serie.id, "serie");
     res.status(201).json(serie);
   };
 

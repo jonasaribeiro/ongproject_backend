@@ -20,22 +20,14 @@ class SeasonService {
     return this.validateAndTransformSeason(season);
   };
 
-  static getAll = async (serieId: string): Promise<TSeasonResponse[]> => {
-    if (serieId) {
-      const seasons = await prisma.season.findMany({ where: { serieId } });
-      return seasons;
-    } else {
-      const seasons = await prisma.season.findMany();
-      return seasons;
-    }
-  };
-
-  static getById = async (id: string): Promise<TSeasonResponse> => {
-    const season = await prisma.season.findUniqueOrThrow({
-      where: { id },
+  static toggleActive = async (
+    seasonId: string,
+    activeStatus: boolean
+  ): Promise<void> => {
+    await prisma.season.update({
+      where: { id: seasonId },
+      data: { active: !activeStatus },
     });
-
-    return this.validateAndTransformSeason(season);
   };
 
   static update = async (

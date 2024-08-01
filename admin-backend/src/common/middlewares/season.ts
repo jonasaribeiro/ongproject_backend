@@ -19,7 +19,7 @@ class SeasonMiddleware {
     if (!season) {
       throw new AppError("Season not found", 404);
     }
-
+    res.locals.active = season.active;
     return next();
   };
 

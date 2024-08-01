@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import {
   SEpisodeResponse,
@@ -5,6 +6,7 @@ import {
   TEpisodeResponse,
   TEpisodeUpdate,
 } from "../schemas";
+import MediaServiceHelper from "../utils/mediaServiceHelper";
 
 class EpisodeService {
   private static validateAndTransformEpisode = (
@@ -22,23 +24,24 @@ class EpisodeService {
     return this.validateAndTransformEpisode(episode);
   };
 
-  static getAll = async (seasonId: string): Promise<TEpisodeResponse[]> => {
-    if (seasonId) {
-      const episodes = await prisma.episode.findMany({ where: { seasonId } });
-      return episodes;
-    } else {
-      const episodes = await prisma.episode.findMany();
-      return episodes;
-    }
-  };
+  static async uploadEpisodeFiles(
+    req: Request,
+    res: Response,
+    serieId: string,
+    seasonNumber: number,
+    episodeNumber: number
+  ): Promise<any> {
+    const result = await MediaServiceHelper.uploadFiles(
+      req,
+      res,
+      `${serieId}/seasons/${seasonNumber}/episodes/${episodeNumber}`,
+      "serie"
+    );
 
-  static getById = async (id: string): Promise<TEpisodeResponse> => {
-    const episode = await prisma.episode.findUniqueOrThrow({
-      where: { id },
-    });
-
-    return this.validateAndTransformEpisode(episode);
-  };
+    return {
+      message: "Files uploaded successfully",
+    };
+  }
 
   static update = async (
     id: string,

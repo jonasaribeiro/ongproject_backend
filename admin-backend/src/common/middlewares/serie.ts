@@ -19,7 +19,7 @@ class SerieMiddleware {
     if (!serie) {
       throw new AppError("Serie not found", 404);
     }
-
+    res.locals.active = serie.active;
     return next();
   };
 

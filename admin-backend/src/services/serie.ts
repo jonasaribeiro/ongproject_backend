@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import {
   SSerieResponse,
@@ -5,6 +6,7 @@ import {
   TSerieResponse,
   TSerieUpdate,
 } from "../schemas";
+import MediaServiceHelper from "../utils/mediaServiceHelper";
 
 class SerieService {
   private static validateAndTransformSerie = (card: any): TSerieResponse => {
@@ -12,74 +14,47 @@ class SerieService {
   };
 
   static create = async (data: TSerieRequest): Promise<TSerieResponse> => {
+    const { title, description, release, active, categories, ageRating } = data;
     const serie = await prisma.serie.create({
       data: {
-        ...data,
+        title,
+        description,
+        release,
+        active,
       },
     });
+
+    await prisma.serieAgeRating.create({
+      data: { serieId: serie.id, ageRatingId: ageRating.id },
+    });
+
+    const categoriesData = categories.map((category) => {
+      return { serieId: serie.id, categoryId: category.id };
+    });
+
+    await prisma.serieCategory.createMany({
+      data: categoriesData,
+    });
+
     return this.validateAndTransformSerie(serie);
   };
 
-  static getAll = async (
-    categoryId?: string,
-    ageId?: string
-  ): Promise<TSerieResponse[]> => {
-    if (categoryId && ageId) {
-      const series = await prisma.movie.findMany({
-        where: {
-          AND: [
-            {
-              categories: {
-                some: {
-                  categoryId: categoryId,
-                },
-              },
-            },
-            {
-              ageRatings: {
-                some: {
-                  ageRatingId: ageId,
-                },
-              },
-            },
-          ],
-        },
-      });
-      return SSerieResponse.array().parse(series);
-    } else if (ageId) {
-      const series = await prisma.movie.findMany({
-        where: {
-          ageRatings: {
-            some: {
-              ageRatingId: ageId,
-            },
-          },
-        },
-      });
-      return SSerieResponse.array().parse(series);
-    } else if (categoryId) {
-      const series = await prisma.serie.findMany({
-        where: {
-          categories: {
-            some: {
-              categoryId: categoryId,
-            },
-          },
-        },
-      });
-      return SSerieResponse.array().parse(series);
-    } else {
-      const series = await prisma.movie.findMany();
-      return SSerieResponse.array().parse(series);
-    }
+  static uploadPoster = async (
+    req: Request,
+    mediaID: string,
+    mediaType: "movie" | "serie"
+  ): Promise<void> => {
+    return MediaServiceHelper.uploadJustPoster(req, mediaID, mediaType);
   };
 
-  static getById = async (id: string): Promise<TSerieResponse> => {
-    const serie = await prisma.serie.findUniqueOrThrow({
-      where: { id },
+  static toggleActive = async (
+    serieId: string,
+    activeStatus: boolean
+  ): Promise<void> => {
+    await prisma.serie.update({
+      where: { id: serieId },
+      data: { active: !activeStatus },
     });
-
-    return SSerieResponse.parse(serie);
   };
 
   static update = async (

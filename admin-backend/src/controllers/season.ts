@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { SeasonService } from "../services/season";
+import prisma from "../config/prisma";
 
 class SeasonController {
   static register = async (req: Request, res: Response) => {
@@ -7,19 +8,14 @@ class SeasonController {
     res.status(201).json(season);
   };
 
-  static getAll = async (req: Request, res: Response) => {
-    const serieId = req.params.serieId;
-
-    const seasons = await SeasonService.getAll(serieId);
-
-    res.status(200).json(seasons);
-  };
-
-  static getById = async (req: Request, res: Response) => {
-    const seasonId = req.params.id;
-    const season = await SeasonService.getById(seasonId);
-
-    res.status(200).json(season);
+  static toggleActive = async (
+    seasonId: string,
+    activeStatus: boolean
+  ): Promise<void> => {
+    await prisma.season.update({
+      where: { id: seasonId },
+      data: { active: !activeStatus },
+    });
   };
 
   static update = async (req: Request, res: Response) => {
