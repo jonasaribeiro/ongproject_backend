@@ -8,14 +8,12 @@ class SeasonController {
     res.status(201).json(season);
   };
 
-  static toggleActive = async (
-    seasonId: string,
-    activeStatus: boolean
-  ): Promise<void> => {
-    await prisma.season.update({
-      where: { id: seasonId },
-      data: { active: !activeStatus },
-    });
+  static toggleActive = async (req: Request, res: Response) => {
+    const seasonId = req.params.id;
+    const active = res.locals.active;
+    await SeasonService.toggleActive(seasonId, active);
+
+    res.status(200).json({ message: "Changed season active status." });
   };
 
   static update = async (req: Request, res: Response) => {

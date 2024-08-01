@@ -9,6 +9,14 @@ class SerieController {
     res.status(201).json(serie);
   };
 
+  static toggleActive = async (req: Request, res: Response) => {
+    const serieId = req.params.id;
+    const active = res.locals.active;
+    await SerieService.toggleActive(serieId, active);
+
+    res.status(200).json({ message: "Changed serie active status." });
+  };
+
   static update = async (req: Request, res: Response) => {
     const serieId = req.params.id;
     const serie = await SerieService.update(serieId, req.body);

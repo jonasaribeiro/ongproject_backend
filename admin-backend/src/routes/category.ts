@@ -13,10 +13,6 @@ categoryRouter.post(
   CategoryController.register
 );
 
-categoryRouter.get("/:id", Validators.tokenIsValid, CategoryController.getById);
-
-categoryRouter.get("", Validators.tokenIsValid, CategoryController.getAll);
-
 categoryRouter.patch(
   "/:id",
   Validators.tokenIsValid,

@@ -12,9 +12,6 @@ avatarRouter.post(
   AvatarController.register
 );
 
-avatarRouter.get("/:id", Validators.tokenIsValid, AvatarController.getById);
-avatarRouter.get("", Validators.tokenIsValid, AvatarController.getAll);
-
 avatarRouter.patch(
   "/:id",
   Validators.tokenIsValid,
@@ -22,6 +19,7 @@ avatarRouter.patch(
   Validators.bodyIsValid(SAvatarUpdate),
   AvatarController.update
 );
+
 avatarRouter.delete(
   "/:id",
   Validators.tokenIsValid,

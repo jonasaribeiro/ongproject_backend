@@ -83,4 +83,13 @@ const multerUploadSingleEpisode = multer({
   { name: "poster", maxCount: 1 },
 ]);
 
-export { multerUploadMovie, multerUploadSingleEpisode };
+const multerUploadSinglePoster = multer({
+  storage: episodeStorage,
+  fileFilter: fileFilter,
+}).single("poster");
+
+export {
+  multerUploadMovie,
+  multerUploadSingleEpisode,
+  multerUploadSinglePoster,
+};

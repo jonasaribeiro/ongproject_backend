@@ -20,8 +20,9 @@ class EpisodeService {
       data: {
         ...data,
       },
+      include: { season: true },
     });
-    return this.validateAndTransformEpisode(episode);
+    return episode;
   };
 
   static async uploadEpisodeFiles(

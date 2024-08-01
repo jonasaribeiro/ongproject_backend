@@ -1,4 +1,5 @@
 import z from "zod";
+import { SSeasonResponse } from "./season";
 
 const SEpisode = z.object({
   id: z.string().uuid(),
@@ -12,7 +13,7 @@ const SEpisodeRequest = SEpisode.omit({
   id: true,
 });
 
-const SEpisodeResponse = SEpisode;
+const SEpisodeResponse = SEpisode.extend({ season: SSeasonResponse });
 
 const SEpisodeUpdate = SEpisodeRequest.partial();
 

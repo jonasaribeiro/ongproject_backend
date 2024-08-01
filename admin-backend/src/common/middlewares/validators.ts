@@ -9,6 +9,24 @@ import { TokenExpiredError, verify } from "jsonwebtoken";
 import { SECRET_KEY } from "../../config/environment";
 
 class Validators {
+  static isAdmin(
+    arg0: string,
+    tokenIsValid: (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void | {}>,
+    isAdmin: any,
+    arg3: (req: Request, _res: Response, next: NextFunction) => void,
+    episodeTitleExists: (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>,
+    register: (req: Request, res: Response) => Promise<void>
+  ) {
+    throw new Error("Method not implemented.");
+  }
   static bodyIsValid = (schema: ZodTypeAny) => {
     return (req: Request, _res: Response, next: NextFunction): void => {
       const validatedBody = schema.parse(req.body);

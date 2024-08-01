@@ -121,8 +121,8 @@ class MediaServiceHelper {
     const mediaDir = path.join(databasePath, `${mediaType}s`, mediaId);
     FileHelper.createDirectory(mediaDir);
 
-    const files = req.files as IMulterUploadFiles;
-    const posterFile = files.poster ? files.poster[0] : null;
+    const file = req.file as IMulterUploadFiles;
+    const posterFile = file.poster ? file.poster[0] : null;
 
     if (posterFile) {
       await MediaServiceHelper.uploadPoster(posterFile, mediaDir);

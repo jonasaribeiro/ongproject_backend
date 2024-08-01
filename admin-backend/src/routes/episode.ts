@@ -1,15 +1,34 @@
 import { Router } from "express";
 import { EpisodeController } from "../controllers";
 import { Validators, EpisodeMiddleware } from "../common/middlewares";
+import { SEpisodeRequest, SEpisodeUpdate } from "../schemas";
+import { multerUploadSingleEpisode } from "../config/multer";
 
 const episodeRouter: Router = Router();
 
-episodeRouter.get(
+episodeRouter.post(
+  "",
+  Validators.tokenIsValid,
+  multerUploadSingleEpisode,
+  Validators.bodyIsValid(SEpisodeRequest),
+  EpisodeMiddleware.episodeTitleExists,
+  EpisodeController.register
+);
+
+episodeRouter.patch(
   "/:id",
   Validators.tokenIsValid,
   EpisodeMiddleware.episodeExists,
-  EpisodeController.getById
+  Validators.bodyIsValid(SEpisodeUpdate),
+  EpisodeMiddleware.episodeTitleExists,
+  EpisodeController.update
 );
-episodeRouter.get("", Validators.tokenIsValid, EpisodeController.getAll);
+
+episodeRouter.delete(
+  "/:id",
+  Validators.tokenIsValid,
+  EpisodeMiddleware.episodeExists,
+  EpisodeController.delete
+);
 
 export { episodeRouter };

@@ -13,14 +13,6 @@ ageRatingRouter.post(
   AgeRatingController.register
 );
 
-ageRatingRouter.get(
-  "/:id",
-  Validators.tokenIsValid,
-  AgeRatingController.getById
-);
-
-ageRatingRouter.get("", Validators.tokenIsValid, AgeRatingController.getAll);
-
 ageRatingRouter.patch(
   "/:id",
   Validators.tokenIsValid,
