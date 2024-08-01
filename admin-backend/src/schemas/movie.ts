@@ -4,9 +4,9 @@ import { SAgeRatingResponse } from "./ageRating";
 
 const SMovie = z.object({
   id: z.string().uuid(),
-  title: z.string(),
-  description: z.string(),
-  release: z.string().length(4),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  release: z.string().length(4, "Publication year is required"),
   createdAt: z.date(),
   updatedAt: z.date(),
   active: z.boolean(),

@@ -103,6 +103,7 @@ class SerieService {
       data: {
         ...data,
       },
+      include: { season: true },
     });
 
     return episode;
