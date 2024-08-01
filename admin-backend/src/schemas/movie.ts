@@ -1,4 +1,6 @@
 import z from "zod";
+import { SCategoryResponse } from "./category";
+import { SAgeRatingResponse } from "./ageRating";
 
 const SMovie = z.object({
   id: z.string().uuid(),
@@ -14,16 +16,23 @@ const SMovieRequest = SMovie.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  categories: z.array(SCategoryResponse),
+  ageRating: SAgeRatingResponse,
 });
 
 const SMovieResponse = SMovie;
 
-const SMovieUpdate = SMovieRequest.partial();
+const SMovieUpdate = SMovie.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
 
 type TMovie = z.infer<typeof SMovie>;
 type TMovieRequest = z.infer<typeof SMovieRequest>;
 type TMovieResponse = z.infer<typeof SMovieResponse>;
-type TMovieUpdate = Partial<TMovieRequest>;
+type TMovieUpdate = Partial<typeof SMovieUpdate>;
 
 export {
   SMovie,

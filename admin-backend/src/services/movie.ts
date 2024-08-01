@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import {
   SMovieResponse,
@@ -5,77 +6,83 @@ import {
   TMovieResponse,
   TMovieUpdate,
 } from "../schemas";
+import MediaServiceHelper from "../utils/mediaServiceHelper";
 
 class MovieService {
-  private static validateAndTransformMovie = (card: any): TMovieResponse => {
-    return SMovieResponse.parse(card);
+  private static validateAndTransformMovie = (movie: any): TMovieResponse => {
+    return SMovieResponse.parse(movie);
   };
 
   static create = async (data: TMovieRequest): Promise<TMovieResponse> => {
+    const { title, description, release, active, categories, ageRating } = data;
     const movie = await prisma.movie.create({
       data: {
-        ...data,
+        title,
+        description,
+        release,
+        active,
       },
     });
+
+    await prisma.movieAgeRating.create({
+      data: { movieId: movie.id, ageRatingId: ageRating.id },
+    });
+
+    const categoriesData = categories.map((category) => {
+      return { movieId: movie.id, categoryId: category.id };
+    });
+
+    await prisma.movieCategory.createMany({
+      data: categoriesData,
+    });
+
     return this.validateAndTransformMovie(movie);
   };
 
-  static getAll = async (
-    categoryId?: string,
-    ageId?: string
-  ): Promise<TMovieResponse[]> => {
-    if (categoryId && ageId) {
-      const movies = await prisma.movie.findMany({
-        where: {
-          AND: [
-            {
-              categories: {
-                some: {
-                  categoryId: categoryId,
-                },
-              },
-            },
-            {
-              ageRatings: {
-                some: {
-                  ageRatingId: ageId,
-                },
-              },
-            },
-          ],
-        },
+  static async uploadFiles(
+    req: Request,
+    res: Response,
+    movieId: string,
+    type: "movie" | "serie"
+  ): Promise<any> {
+    const result = await MediaServiceHelper.uploadFiles(
+      req,
+      res,
+      movieId,
+      type
+    );
+
+    const resolutionNames: string[] = [];
+    if (result.resolutions.sd) resolutionNames.push("SD");
+    if (result.resolutions.hd) resolutionNames.push("HD");
+    if (result.resolutions._4k) resolutionNames.push("4K");
+
+    for (const name of resolutionNames) {
+      const resolution = await prisma.resolution.upsert({
+        where: { name },
+        update: {},
+        create: { name },
       });
-      return SMovieResponse.array().parse(movies);
-    } else if (ageId) {
-      const movies = await prisma.movie.findMany({
-        where: {
-          categories: {
-            some: {
-              categoryId: categoryId,
-            },
-          },
-        },
+
+      await prisma.resolutionMovie.create({
+        data: { resolutionId: resolution.id, movieId },
       });
-      return SMovieResponse.array().parse(movies);
-    } else if (categoryId) {
-      const movies = await prisma.category.findMany({
-        where: { id: categoryId },
-        select: { movieCategories: { select: { movie: true } } },
-      });
-      return SMovieResponse.array().parse(movies);
-    } else {
-      const movies = await prisma.movie.findMany();
-      return SMovieResponse.array().parse(movies);
     }
-  };
 
-  static getById = async (id: string): Promise<TMovieResponse> => {
-    const movie = await prisma.movie.findUniqueOrThrow({
-      where: { id },
+    return {
+      message: "Files uploaded successfully",
+    };
+  }
+
+  static async toggleActive(
+    movieId: string,
+    activeStatus: boolean
+  ): Promise<void> {
+    await prisma.movie.update({
+      where: { id: movieId },
+      data: { active: !activeStatus },
     });
-
-    return SMovieResponse.parse(movie);
-  };
+  }
 
   static update = async (
     id: string,

@@ -22,7 +22,8 @@ class MediaServiceHelper {
       unprocessedDir,
       Date.now() + "_" + posterFile.originalname
     );
-    await FileHelper.moveFile(posterFile.path, posterFilePath);
+
+    FileHelper.moveFile(posterFile.path, posterFilePath);
 
     // Optimize and move the poster file to the images directory
     const optimizedPosterPath = path.join(imagesDir, "poster.jpg");

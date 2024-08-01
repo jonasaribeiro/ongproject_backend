@@ -4,6 +4,5 @@ export * from "./category";
 export * from "./episode";
 export * from "./movie";
 export * from "./resolution";
-export * from "./serie";
 export * from "./season";
-export * from "./user";
+export * from "./serie";

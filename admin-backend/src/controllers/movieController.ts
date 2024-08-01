@@ -3,11 +3,11 @@ import MovieService from "../services/movieService";
 
 class MovieController {
   static upload = async (req: Request, res: Response) => {
-    const { title, description, pubYear, ageRating, categories } = req.body;
+    const { title, description, release, ageRating, categories } = req.body;
     const movieId = await MovieService.createMovieEntity({
       title,
       description,
-      pubYear,
+      release,
       ageRating: { name: ageRating },
       categories,
     });

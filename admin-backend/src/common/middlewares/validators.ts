@@ -32,7 +32,7 @@ class Validators {
       if (error) throw new AuthenticationError("Token inválido");
 
       if (decoded.role !== "admin") {
-        throw new AppError("Unauthorized", 401);
+        throw new AppError("Forbidden", 403);
       }
 
       res.locals.userId = decoded.userId;

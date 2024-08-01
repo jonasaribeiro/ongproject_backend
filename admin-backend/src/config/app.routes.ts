@@ -4,7 +4,7 @@ import path from "path";
 import MovieController from "../controllers/movieController";
 import SerieController from "../controllers/serieController";
 import { multerUploadMovie, multerUploadSingleEpisode } from "./multer";
-import Validators from "../common/middlewares/validators";
+import { Validators } from "../common/middlewares/validators";
 import { sMovieUploadReqBody } from "../schemas/movieSchemas";
 import {
   sEpisodeUploadReqBody,

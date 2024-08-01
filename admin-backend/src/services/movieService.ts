@@ -7,19 +7,19 @@ class MovieService {
   static createMovieEntity = async (data: {
     title: string;
     description: string;
-    pubYear: string;
+    release: string;
     categories: { name: string }[];
     ageRating: { name: string };
   }): Promise<string> => {
     console.log("Dados recebidos no createMovieEntity:", data);
 
-    const { title, description, pubYear, categories, ageRating } = data;
+    const { title, description, release, categories, ageRating } = data;
 
     if (!title) {
       throw new ValidationError("Title is required");
     }
 
-    if (!pubYear) {
+    if (!release) {
       throw new ValidationError("Publication year is required");
     }
 
@@ -54,14 +54,20 @@ class MovieService {
       data: {
         title,
         description,
-        pubYear,
-        ageRating: {
-          connect: { id: movieAgeRating.id },
-        },
-        categories: {
-          connect: categoriesResults.map((category) => ({ id: category.id })),
-        },
+        release,
       },
+    });
+
+    await prisma.movieAgeRating.create({
+      data: { movieId: movie.id, ageRatingId: movieAgeRating.id },
+    });
+
+    const categoriesData = categoriesResults.map((category) => {
+      return { movieId: movie.id, categoryId: category.id };
+    });
+
+    await prisma.movieCategory.createMany({
+      data: categoriesData,
     });
 
     return movie.id;
@@ -94,18 +100,16 @@ class MovieService {
 
     // Buscar ou criar resoluções e vincular ao filme
     for (const name of resolutionNames) {
-      const resolution = await prisma.movieResolution.upsert({
+      const resolution = await prisma.resolution.upsert({
         where: { name },
         update: {},
         create: { name },
       });
 
-      await prisma.movie.update({
-        where: { id: movieId },
+      await prisma.resolutionMovie.create({
         data: {
-          resolutions: {
-            connect: { id: resolution.id },
-          },
+          movieId,
+          resolutionId: resolution.id,
         },
       });
     }
@@ -131,19 +135,14 @@ class MovieService {
 
     // Buscar ou criar resoluções e vincular ao filme
     for (const name of resolutionNames) {
-      const resolution = await prisma.movieResolution.upsert({
+      const resolution = await prisma.resolution.upsert({
         where: { name },
         update: {},
         create: { name },
       });
 
-      await prisma.movie.update({
-        where: { id: movieId },
-        data: {
-          resolutions: {
-            connect: { id: resolution.id },
-          },
-        },
+      await prisma.resolutionMovie.create({
+        data: { resolutionId: resolution.id, movieId },
       });
     }
 

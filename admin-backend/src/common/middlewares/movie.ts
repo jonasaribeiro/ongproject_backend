@@ -10,15 +10,17 @@ class MovieMiddleware {
   ) => {
     const { id } = req.params;
 
-    const card = await prisma.card.findFirst({
+    const movie = await prisma.movie.findFirst({
       where: {
         id,
       },
     });
 
-    if (!card) {
-      throw new AppError("Card not found", 404);
+    if (!movie) {
+      throw new AppError("Movie not found", 404);
     }
+
+    res.locals.active = movie.active;
 
     return next();
   };
