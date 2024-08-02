@@ -11,6 +11,13 @@ serieRouter.get(
   SerieController.getById
 );
 
+serieRouter.get(
+  "/:id/poster",
+  Validators.tokenIsValid,
+  SerieMiddleware.serieExists,
+  SerieController.getSeriePoster
+);
+
 serieRouter.get("", Validators.tokenIsValid, SerieController.getAll);
 
 export { serieRouter };

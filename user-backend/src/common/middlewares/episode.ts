@@ -14,12 +14,14 @@ class EpisodeMiddleware {
       where: {
         id,
       },
+      include: { season: true },
     });
 
     if (!episode) {
       throw new AppError("Episode not found", 404);
     }
-
+    res.locals.seasonNumber = episode.season.seasonNumber;
+    res.locals.episodeNumber = episode.episodeNumber;
     return next();
   };
 

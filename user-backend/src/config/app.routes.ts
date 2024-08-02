@@ -34,28 +34,27 @@ app.get("/player", (req, res) => {
 
 app.use(express.json());
 
-app.get("/stream/movie/:id/master.m3u8", StreamController.movieGetMaster);
-app.get("/stream/movie/:id/:folder/:fileName", StreamController.movieGetFile);
+app.get("/stream/movies/:id/master.m3u8", StreamController.movieGetMaster);
+app.get("/stream/movies/:id/:folder/:fileName", StreamController.movieGetFile);
 
-app.use("/user", userRouter);
-app.use("/user/profile", profileRouter);
-app.use("/user/profile/restriction", restrictionRouter);
-app.use("/user/profile/myList", myListRouter);
-app.use("/user/profile/watchingMovie", watchingMovieRouter);
-app.use("/user/profile/watchingSerie", watchingSerieRouter);
+app.use("/users", userRouter);
+app.use("/users/profile", profileRouter);
+app.use("/users/profile/restriction", restrictionRouter);
+app.use("/users/profile/myList", myListRouter);
+app.use("/users/profile/watchingMovie", watchingMovieRouter);
+app.use("/users/profile/watchingSerie", watchingSerieRouter);
 app.use("/login", loginRouter);
-app.use("/card", cardRouter);
+app.use("/cards", cardRouter);
 
-app.use("/avatar", avatarRouter);
-app.use("/resolution", resolutionRouter);
-app.use("/category", categoryRouter);
-app.use("/ageRating", ageRatingRouter);
+app.use("/ageRatings", ageRatingRouter);
+app.use("/avatars", avatarRouter);
+app.use("/categories", categoryRouter);
+app.use("/resolutions", resolutionRouter);
 
-app.use("/movie", movieRouter);
-app.get("/movie/:movieId/poster");
-app.use("/serie", serieRouter);
-app.use("/serie/:serieId/season", seasonRouter);
-app.use("/serie/:serieId/season/:seasonId/episode", episodeRouter);
+app.use("/movies", movieRouter);
+app.use("/series", serieRouter);
+app.use("/series/:serieId/seasons", seasonRouter);
+app.use("/series/:serieId/seasons/:seasonId/episodes", episodeRouter);
 
 app.use(ErrorHandler.handle);
 

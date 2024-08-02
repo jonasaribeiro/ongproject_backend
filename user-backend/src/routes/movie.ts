@@ -10,6 +10,14 @@ movieRouter.get(
   MovieMiddleware.movieExists,
   MovieController.getById
 );
+
+movieRouter.get(
+  "/:id/poster",
+  Validators.tokenIsValid,
+  MovieMiddleware.movieExists,
+  MovieController.getMoviePoster
+);
+
 movieRouter.get("", Validators.tokenIsValid, MovieController.getAll);
 
 export { movieRouter };
