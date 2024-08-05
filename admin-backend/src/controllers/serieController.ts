@@ -3,11 +3,11 @@ import SerieService from "../services/serieService";
 
 class SeriesController {
   static createSerie = async (req: Request, res: Response) => {
-    const { title, description, releaseYear, ageRating, categories } = req.body;
+    const { title, description, release, ageRating, categories } = req.body;
     const serieId = await SerieService.createSerieEntity({
       title,
       description,
-      releaseYear,
+      release,
       ageRating: { name: ageRating },
       categories,
     });
@@ -17,35 +17,25 @@ class SeriesController {
 
   static addSeason = async (req: Request, res: Response) => {
     const { serieId } = req.params;
-    const { seasonNumber } = req.body;
+    const data = req.body;
 
-    const seasonId = await SerieService.addSeason(serieId, {
-      seasonNumber: Number(seasonNumber),
-    });
+    const seasonId = await SerieService.addSeason(data);
 
     res.status(201).json({ id: seasonId });
   };
 
   static uploadEpisode = async (req: Request, res: Response) => {
     const { serieId, seasonNumber } = req.params;
-    const { episodeNumber, title, description } = req.body;
+    const data = req.body;
 
-    const episodeId = await SerieService.createEpisodeEntity(
-      serieId,
-      Number(seasonNumber),
-      {
-        episodeNumber: Number(episodeNumber),
-        title,
-        description,
-      }
-    );
+    const episode = await SerieService.createEpisodeEntity(data);
 
     const result = await SerieService.uploadEpisodeFiles(
       req,
       res,
       serieId,
       Number(seasonNumber),
-      Number(episodeNumber)
+      episode.episodeNumber
     );
     res.status(201).json(result);
   };

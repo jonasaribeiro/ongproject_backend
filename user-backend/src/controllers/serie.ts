@@ -19,6 +19,18 @@ class SerieController {
 
     res.status(200).json(serie);
   };
+
+  static getSeriePoster = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const imagePath = await SerieService.getMoviePosterPath(id);
+
+    if (!imagePath) {
+      res.status(404).json({ error: "Poster not found" });
+      return;
+    }
+
+    res.sendFile(imagePath);
+  };
 }
 
 export { SerieController };

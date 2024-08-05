@@ -2,24 +2,25 @@ import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import { ValidationError } from "../errors/CustomErrors";
 import MediaServiceHelper from "../utils/mediaServiceHelper";
+import { TEpisodeRequest, TEpisodeResponse, TSeasonRequest } from "../schemas";
 
 class SerieService {
   static async createSerieEntity(data: {
     title: string;
     description: string;
-    releaseYear: string;
+    release: string;
     categories: { name: string }[];
     ageRating: { name: string };
   }): Promise<string> {
     console.log("Dados recebidos no createSerieEntity:", data);
 
-    const { title, description, releaseYear, categories, ageRating } = data;
+    const { title, description, release, categories, ageRating } = data;
 
     if (!title) {
       throw new ValidationError("Title is required");
     }
 
-    if (!releaseYear) {
+    if (!release) {
       throw new ValidationError("Release year is required");
     }
 
@@ -54,35 +55,33 @@ class SerieService {
       data: {
         title,
         description,
-        releaseYear,
-        ageRating: {
-          connect: { id: serieAgeRating.id },
-        },
-        categories: {
-          connect: categoriesResults.map((category) => ({ id: category.id })),
-        },
+        release,
       },
+    });
+
+    await prisma.serieAgeRating.create({
+      data: { serieId: serie.id, ageRatingId: serieAgeRating.id },
+    });
+
+    const categoriesData = categoriesResults.map((category) => {
+      return { serieId: serie.id, categoryId: category.id };
+    });
+
+    await prisma.serieCategory.createMany({
+      data: categoriesData,
     });
 
     return serie.id;
   }
 
-  static async addSeason(
-    serieId: string,
-    data: { seasonNumber: number }
-  ): Promise<string> {
-    const { seasonNumber } = data;
-
-    if (!seasonNumber) {
+  static async addSeason(data: TSeasonRequest): Promise<string> {
+    if (!data.seasonNumber) {
       throw new ValidationError("Season number is required");
     }
 
     const season = await prisma.season.create({
       data: {
-        seasonNumber,
-        serie: {
-          connect: { id: serieId },
-        },
+        ...data,
       },
     });
 
@@ -90,47 +89,24 @@ class SerieService {
   }
 
   static async createEpisodeEntity(
-    serieId: string,
-    seasonNumber: number,
-    data: {
-      episodeNumber: number;
-      title: string;
-      description: string;
-    }
-  ): Promise<string> {
-    const { episodeNumber, title, description } = data;
-
-    if (!episodeNumber) {
+    data: TEpisodeRequest
+  ): Promise<TEpisodeResponse> {
+    if (!data.episodeNumber) {
       throw new ValidationError("Episode number is required");
     }
 
-    if (!title) {
+    if (!data.title) {
       throw new ValidationError("Title is required");
-    }
-
-    const season = await prisma.season.findFirst({
-      where: {
-        serieId: serieId,
-        seasonNumber: seasonNumber,
-      },
-    });
-
-    if (!season) {
-      throw new ValidationError("Season not found");
     }
 
     const episode = await prisma.episode.create({
       data: {
-        episodeNumber,
-        title,
-        description,
-        season: {
-          connect: { id: season.id },
-        },
+        ...data,
       },
+      include: { season: true },
     });
 
-    return episode.id;
+    return episode;
   }
 
   static async uploadEpisodeFiles(

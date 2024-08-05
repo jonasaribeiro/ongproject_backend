@@ -19,6 +19,18 @@ class MovieController {
 
     res.status(200).json(movie);
   };
+
+  static getMoviePoster = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const imagePath = await MovieService.getMoviePosterPath(id);
+
+    if (!imagePath) {
+      res.status(404).json({ error: "Poster not found" });
+      return;
+    }
+
+    res.sendFile(imagePath);
+  };
 }
 
 export { MovieController };

@@ -22,7 +22,8 @@ class MediaServiceHelper {
       unprocessedDir,
       Date.now() + "_" + posterFile.originalname
     );
-    await FileHelper.moveFile(posterFile.path, posterFilePath);
+
+    FileHelper.moveFile(posterFile.path, posterFilePath);
 
     // Optimize and move the poster file to the images directory
     const optimizedPosterPath = path.join(imagesDir, "poster.jpg");
@@ -80,8 +81,9 @@ class MediaServiceHelper {
     }
 
     const mediaDir = path.join(databasePath, `${mediaType}s`, mediaId);
-    const mainDir = path.join(mediaDir, "main");
     FileHelper.createDirectory(mediaDir);
+
+    const mainDir = path.join(mediaDir, "main");
     FileHelper.createDirectory(mainDir);
 
     const files = req.files as IMulterUploadFiles;
@@ -101,6 +103,33 @@ class MediaServiceHelper {
       resolutions,
     };
   }
+
+  static uploadJustPoster = async (
+    req: Request,
+    mediaId: string,
+    mediaType: "movie" | "serie"
+  ): Promise<any> => {
+    if (!req.files) {
+      throw new ValidationError("Files are missing");
+    }
+
+    const { title } = req.body;
+    if (!title) {
+      throw new ValidationError("Title is required");
+    }
+
+    const mediaDir = path.join(databasePath, `${mediaType}s`, mediaId);
+    FileHelper.createDirectory(mediaDir);
+
+    const file = req.file as IMulterUploadFiles;
+    const posterFile = file.poster ? file.poster[0] : null;
+
+    if (posterFile) {
+      await MediaServiceHelper.uploadPoster(posterFile, mediaDir);
+    }
+
+    return;
+  };
 }
 
 export default MediaServiceHelper;

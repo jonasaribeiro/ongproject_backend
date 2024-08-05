@@ -1,5 +1,7 @@
 import prisma from "../config/prisma";
 import { SSerieResponse, TSerieResponse } from "../schemas";
+import path from "path";
+import fs from "fs/promises";
 
 class SerieService {
   static getAll = async (
@@ -63,6 +65,30 @@ class SerieService {
 
     return SSerieResponse.parse(serie);
   };
+
+  static async getMoviePosterPath(serieId: string): Promise<string | null> {
+    const imagePath = path.join(
+      __dirname,
+      `../../database/series/${serieId}/images/poster.jpg`
+    );
+
+    const exists = await SerieService.fileExists(imagePath);
+    if (exists) {
+      return imagePath;
+    } else {
+      return null;
+    }
+  }
+
+  private static async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch (error) {
+      console.error("Error accessing file:", error);
+      return false;
+    }
+  }
 }
 
 export { SerieService };

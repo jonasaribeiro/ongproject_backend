@@ -7,73 +7,253 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Movie Models
-model Movie {
-  id          String            @id @default(uuid())
-  title       String
-  description String
-  pubYear     String
-  categories  Category[]        @relation("MovieCategories")
-  resolutions MovieResolution[] @relation("MovieResolutions")
-  ageRatingId String?
-  ageRating   AgeRating?        @relation("MovieAgeRatings", fields: [ageRatingId], references: [id])
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  active      Boolean           @default(false)
+model User {
+  id            String     @id @default(uuid())
+  name          String     @db.VarChar(255)
+  email         String     @unique @db.VarChar(255)
+  password      String     @db.VarChar(255)
+  phone         String     @unique @db.VarChar(255)
+  active        Boolean    @default(true)
+  resetPassword String     @default("") @db.VarChar(255)
+  registration  DateTime   @default(now())
+  membership    Membership
+  role          Role       @default(user)
+  profiles      Profile[]
+  cards         Card[]
 }
 
-// Serie Models
+model Profile {
+  id             String          @id @default(uuid())
+  name           String          @db.VarChar(255)
+  userId         String
+  avatarId       String
+  age            String
+  user           User            @relation(fields: [userId], references: [id])
+  avatar         Avatar          @relation(fields: [avatarId], references: [id])
+  watchingSeries WatchingSerie[]
+  watchingMovies WatchingMovie[]
+  restrictions   Restrictions[]
+  myList         MyList[]
+  preferences    Preferences[]
+  ageRating      AgeRating       @relation(fields: [age], references: [id])
+}
+
+model Card {
+  id         String    @id @default(uuid())
+  number     String    @db.VarChar(16)
+  expireDate DateTime
+  cvv        String    @db.VarChar(3)
+  ownerName  String    @db.VarChar(255)
+  cpf        String    @db.VarChar(11)
+  method     PayMethod
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+}
+
+model Avatar {
+  id       String    @id @default(uuid())
+  source   String    @db.VarChar(255)
+  profiles Profile[]
+}
+
+model Category {
+  id              String          @id @default(uuid())
+  name            String          @unique @db.VarChar(255)
+  preferences     Preferences[]
+  movieCategories MovieCategory[]
+  serieCategories SerieCategory[]
+}
+
+model Restrictions {
+  id        String  @id @default(uuid())
+  profileId String
+  movieId   String?
+  serieId   String?
+  profile   Profile @relation(fields: [profileId], references: [id])
+  movie     Movie?  @relation(fields: [movieId], references: [id])
+  serie     Serie?  @relation(fields: [serieId], references: [id])
+}
+
+model MyList {
+  id        String  @id @default(uuid())
+  profileId String
+  movieId   String?
+  serieId   String?
+  profile   Profile @relation(fields: [profileId], references: [id])
+  movie     Movie?  @relation(fields: [movieId], references: [id])
+  serie     Serie?  @relation(fields: [serieId], references: [id])
+}
+
+model Preferences {
+  id         String   @id @default(uuid())
+  profileId  String
+  categoryId String
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model Movie {
+  id             String            @id @default(uuid())
+  title          String            @db.VarChar(255)
+  description    String            @db.VarChar(255)
+  release        String            @db.VarChar(4)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  active         Boolean           @default(false)
+  watchingMovies WatchingMovie[]
+  restrictions   Restrictions[]
+  myList         MyList[]
+  ageRatings     MovieAgeRating[]
+  categories     MovieCategory[]
+  resolutions    ResolutionMovie[]
+}
+
 model Serie {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  releaseYear String
-  seasons     Season[]
-  categories  Category[] @relation("SerieCategories")
-  ageRatingId String?
-  ageRating   AgeRating? @relation("SerieAgeRatings", fields: [ageRatingId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  active      Boolean    @default(false)
+  id             String            @id @default(uuid())
+  title          String            @db.VarChar(255)
+  description    String            @db.VarChar(255)
+  release        String            @db.VarChar(4)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  active         Boolean           @default(false)
+  seasons        Season[]
+  watchingSeries WatchingSerie[]
+  restrictions   Restrictions[]
+  myList         MyList[]
+  ageRatings     SerieAgeRating[]
+  categories     SerieCategory[]
+  resolutions    ResolutionSerie[]
 }
 
 model Season {
   id           String    @id @default(uuid())
-  serieId      String
-  serie        Serie     @relation(fields: [serieId], references: [id])
+  title        String    @db.VarChar(255)
+  release      String    @db.VarChar(4)
+  active       Boolean   @default(false)
   seasonNumber Int
   episodes     Episode[]
-  active       Boolean   @default(false)
+  serieId      String
+  serie        Serie     @relation(fields: [serieId], references: [id])
 }
 
 model Episode {
-  id            String @id @default(uuid())
-  title         String
-  description   String
-  seasonId      String
-  season        Season @relation(fields: [seasonId], references: [id])
-  episodeNumber Int
+  id             String          @id @default(uuid())
+  title          String          @db.VarChar(255)
+  description    String          @db.VarChar(255)
+  episodeNumber  Int
+  watchingSeries WatchingSerie[]
+  seasonId       String
+  season         Season          @relation(fields: [seasonId], references: [id])
 }
 
-// Resolution Models
-model MovieResolution {
-  id     String  @id @default(uuid())
-  name   String  @unique
-  movies Movie[] @relation("MovieResolutions")
+model Resolution {
+  id               String            @id @default(uuid())
+  name             String            @unique @db.VarChar(255)
+  serieResolutions ResolutionSerie[]
+  movieResolutions ResolutionMovie[]
 }
 
-// Age Rating Models
+model ResolutionSerie {
+  serieId      String
+  resolutionId String
+  serie        Serie      @relation(fields: [serieId], references: [id])
+  resolution   Resolution @relation(fields: [resolutionId], references: [id])
+
+  @@id([serieId, resolutionId])
+}
+
+model ResolutionMovie {
+  movieId      String
+  resolutionId String
+  movie        Movie      @relation(fields: [movieId], references: [id])
+  resolution   Resolution @relation(fields: [resolutionId], references: [id])
+
+  @@id([movieId, resolutionId])
+}
+
 model AgeRating {
-  id     String  @id @default(uuid())
-  name   String  @unique
-  movies Movie[] @relation("MovieAgeRatings")
-  series Serie[] @relation("SerieAgeRatings")
+  id       String           @id @default(uuid())
+  name     String           @unique @db.VarChar(255)
+  profiles Profile[]
+  movies   MovieAgeRating[]
+  series   SerieAgeRating[]
 }
 
-// Category Models
-model Category {
-  id     String  @id @default(uuid())
-  name   String  @unique
-  movies Movie[] @relation("MovieCategories")
-  series Serie[] @relation("SerieCategories")
+model WatchingSerie {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  complete  Boolean  @default(false)
+  serieId   String
+  episodeId String
+  profileId String
+  serie     Serie    @relation(fields: [serieId], references: [id])
+  episode   Episode  @relation(fields: [episodeId], references: [id])
+  profile   Profile  @relation(fields: [profileId], references: [id])
+}
+
+model WatchingMovie {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  complete  Boolean  @default(false)
+  movieId   String
+  profileId String
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  profile   Profile  @relation(fields: [profileId], references: [id])
+}
+
+model MovieCategory {
+  movieId    String
+  categoryId String
+  movie      Movie    @relation(fields: [movieId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([movieId, categoryId])
+}
+
+model SerieCategory {
+  serieId    String
+  categoryId String
+  serie      Serie    @relation(fields: [serieId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([serieId, categoryId])
+}
+
+model MovieAgeRating {
+  movieId     String
+  ageRatingId String
+  movie       Movie     @relation(fields: [movieId], references: [id])
+  ageRating   AgeRating @relation(fields: [ageRatingId], references: [id])
+
+  @@id([movieId, ageRatingId])
+}
+
+model SerieAgeRating {
+  serieId     String
+  ageRatingId String
+  serie       Serie     @relation(fields: [serieId], references: [id])
+  ageRating   AgeRating @relation(fields: [ageRatingId], references: [id])
+
+  @@id([serieId, ageRatingId])
+}
+
+enum Membership {
+  plus
+  standard
+  test
+}
+
+enum PayMethod {
+  credit
+  debit
+}
+
+enum ContentType {
+  movie
+  serie
+}
+
+enum Role {
+  user
+  admin
 }

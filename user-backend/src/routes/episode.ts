@@ -10,6 +10,14 @@ episodeRouter.get(
   EpisodeMiddleware.episodeExists,
   EpisodeController.getById
 );
+
+episodeRouter.get(
+  "/:id/poster",
+  Validators.tokenIsValid,
+  EpisodeMiddleware.episodeExists,
+  EpisodeController.getEpisodePoster
+);
+
 episodeRouter.get("", Validators.tokenIsValid, EpisodeController.getAll);
 
 export { episodeRouter };
