@@ -3,42 +3,50 @@ import { EnvironmentVariableError } from "../errors/CustomErrors";
 const dotenv = require("dotenv");
 dotenv.config();
 
-const REQUIRED_ENV_VARIABLES = {
-  common: [
-    "DATABASE_URL",
-    "SECRET_KEY",
-    "TOKEN_EXPIRES_IN",
-    "VIDEO_STORAGE_PATH",
-  ],
-  development: [],
-  production: [],
-  test: [],
-};
-
-type EnvironmentType = "development" | "production" | "test";
+const REQUIRED_ENV_VARIABLES = [
+  "DATABASE_URL",
+  "SECRET_KEY",
+  "TOKEN_EXPIRES_IN",
+  "VIDEO_STORAGE_PATH",
+  "SERVER_PORT",
+];
+const OPTIONAL_ENV_VARIABLES = [];
 
 function checkEnvironmentVariables(): void {
-  const currentEnv = (process.env.NODE_ENV || "development") as EnvironmentType;
-
-  const requiredVariables = [
-    ...REQUIRED_ENV_VARIABLES.common,
-    ...REQUIRED_ENV_VARIABLES[currentEnv],
-  ];
-
-  const missingVariables = requiredVariables.filter(
+  const missingRequired = REQUIRED_ENV_VARIABLES.filter(
     (variable) =>
       typeof process.env[variable] === "undefined" ||
       process.env[variable] === ""
   );
 
-  if (missingVariables.length > 0)
-    throw new EnvironmentVariableError(missingVariables);
+  const missingOptional = OPTIONAL_ENV_VARIABLES.filter(
+    (variable) =>
+      typeof process.env[variable] === "undefined" ||
+      process.env[variable] === ""
+  );
+
+  if (missingRequired.length > 0) {
+    if (!process.env.SKIP_ENV_VALIDATION) {
+      throw new EnvironmentVariableError(missingRequired);
+    } else {
+      console.warn(
+        `Warning: Missing required environment variables: ${missingRequired.join(
+          ", "
+        )}. Running with SKIP_ENV_VALIDATION enabled.`
+      );
+    }
+  }
+
+  if (missingOptional.length > 0) {
+    console.warn(
+      `Warning: Missing optional environment variables: ${missingOptional.join(
+        ", "
+      )}`
+    );
+  }
 }
 
-export const SERVER_PORT = process.env.SERVER_PORT
-  ? parseInt(process.env.SERVER_PORT)
-  : 3001;
-
+export const SERVER_PORT = parseInt(process.env.SERVER_PORT!);
 export const DATABASE_URL = process.env.DATABASE_URL!;
 export const SECRET_KEY = process.env.SECRET_KEY!;
 export const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN!;

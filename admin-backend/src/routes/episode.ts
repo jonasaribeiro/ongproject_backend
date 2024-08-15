@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import { EpisodeController } from "../controllers";
 import { Validators, EpisodeMiddleware } from "../common/middlewares";
 import { SEpisodeRequest, SEpisodeUpdate } from "../schemas";
@@ -8,12 +8,15 @@ const episodeRouter: Router = Router();
 
 episodeRouter.post(
   "",
-  Validators.tokenIsValid,
   multerUploadSingleEpisode,
+  express.json(),
+  Validators.tokenIsValid,
   Validators.bodyIsValid(SEpisodeRequest),
   EpisodeMiddleware.episodeTitleExists,
   EpisodeController.register
 );
+
+episodeRouter.use(express.json());
 
 episodeRouter.patch(
   "/:id",

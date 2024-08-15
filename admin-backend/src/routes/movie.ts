@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import { MovieController } from "../controllers";
 import { Validators, MovieMiddleware } from "../common/middlewares";
 import { SMovieRequest, SMovieUpdate } from "../schemas";
@@ -8,11 +8,14 @@ const movieRouter: Router = Router();
 
 movieRouter.post(
   "",
-  Validators.tokenIsValid,
   multerUploadMovie,
+  express.json(),
+  Validators.tokenIsValid,
   Validators.bodyIsValid(SMovieRequest),
   MovieController.register
 );
+
+movieRouter.use(express.json());
 
 movieRouter.patch(
   "/:id",

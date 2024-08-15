@@ -52,6 +52,15 @@ const episodeStorage = multer.diskStorage({
   },
 });
 
+// Configuração de armazenamento para Avatar
+const avatarStorage = multer.diskStorage({
+  destination: setDestination,
+  filename: (req, file, cb) => {
+    const suffix = file.fieldname === "avatar" ? "_unprocessed" : "";
+    setFilename(req, file, cb, suffix);
+  },
+});
+
 // Filtro de arquivo comum para Movie e Episode
 const fileFilter = (
   req: Request,
@@ -88,8 +97,14 @@ const multerUploadSinglePoster = multer({
   fileFilter: fileFilter,
 }).single("poster");
 
+const multerUploadSingleAvatar = multer({
+  storage: avatarStorage,
+  fileFilter: fileFilter,
+}).single("avatar");
+
 export {
   multerUploadMovie,
   multerUploadSingleEpisode,
   multerUploadSinglePoster,
+  multerUploadSingleAvatar,
 };
