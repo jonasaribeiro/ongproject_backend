@@ -12,6 +12,7 @@ model User {
   name          String     @db.VarChar(255)
   email         String     @unique @db.VarChar(255)
   password      String     @db.VarChar(255)
+  asaasId       String?
   phone         String     @unique @db.VarChar(255)
   active        Boolean    @default(true)
   resetPassword String     @default("") @db.VarChar(255)

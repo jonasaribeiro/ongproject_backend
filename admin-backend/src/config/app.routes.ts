@@ -10,6 +10,7 @@ import {
   serieRouter,
   seasonRouter,
   episodeRouter,
+  webhookRouter,
 } from "../routes";
 
 const app: Application = express();
@@ -24,6 +25,13 @@ app.use(express.static("public"));
 app.get("/upload-movie", (req, res) => {
   res.render("upload-movie");
 });
+
+// Webhook TODO:
+// Aceitar Pagamento ativar user
+// Recusar / Cancelar pagamento desativar user
+// Autenticar conexão para segurança
+// Bloquear firewall para rota apenas recebendo do asaas
+app.use("/webhook", webhookRouter);
 
 app.use("/ageRating", ageRatingRouter);
 app.use("/avatar", avatarRouter);

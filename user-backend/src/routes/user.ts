@@ -13,6 +13,14 @@ userRouter.post(
   UserController.register
 );
 
+// Rota para criar o perfil do Asaas
+userRouter.post(
+  "/subscriptionAccount",
+  // Validação do body
+  // Verificar se já não existe o perfil
+  UserController.createAsaasClient
+);
+
 userRouter.get(
   "/:id",
   Validators.isUser,

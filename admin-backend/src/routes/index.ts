@@ -6,3 +6,4 @@ export * from "./movie";
 export * from "./resolution";
 export * from "./season";
 export * from "./serie";
+export * from "./webhook";

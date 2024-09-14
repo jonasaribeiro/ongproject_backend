@@ -37,6 +37,11 @@ app.use(express.json());
 app.get("/stream/movies/:id/master.m3u8", StreamController.movieGetMaster);
 app.get("/stream/movies/:id/:folder/:fileName", StreamController.movieGetFile);
 
+// TODO Subscription
+// Criar link de pagamento e retornar para usuário
+
+// TODO User
+// Criar conta do Asaas junto do perfil
 app.use("/users", userRouter);
 app.use("/users/profile", profileRouter);
 app.use("/users/profile/restriction", restrictionRouter);
