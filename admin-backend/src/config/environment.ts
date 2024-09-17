@@ -9,18 +9,12 @@ const REQUIRED_ENV_VARIABLES = [
   "TOKEN_EXPIRES_IN",
   "VIDEO_STORAGE_PATH",
   "SERVER_PORT",
-  "ASAAS_IP_ADDRESSES",
+  "STRIPE_API_KEY",
+  "STRIPE_WEBHOOK_ENDPOINT_SECRET",
 ];
-const OPTIONAL_ENV_VARIABLES = [];
 
 function checkEnvironmentVariables(): void {
   const missingRequired = REQUIRED_ENV_VARIABLES.filter(
-    (variable) =>
-      typeof process.env[variable] === "undefined" ||
-      process.env[variable] === ""
-  );
-
-  const missingOptional = OPTIONAL_ENV_VARIABLES.filter(
     (variable) =>
       typeof process.env[variable] === "undefined" ||
       process.env[variable] === ""
@@ -37,14 +31,6 @@ function checkEnvironmentVariables(): void {
       );
     }
   }
-
-  if (missingOptional.length > 0) {
-    console.warn(
-      `Warning: Missing optional environment variables: ${missingOptional.join(
-        ", "
-      )}`
-    );
-  }
 }
 
 export const SERVER_PORT = parseInt(process.env.SERVER_PORT!);
@@ -52,7 +38,8 @@ export const DATABASE_URL = process.env.DATABASE_URL!;
 export const SECRET_KEY = process.env.SECRET_KEY!;
 export const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN!;
 export const VIDEO_STORAGE_PATH = process.env.VIDEO_STORAGE_PATH!;
-
-export const ASAAS_IP_ADDRESSES = process.env.ASAAS_IP_ADDRESSES!.split("-");
+export const STRIPE_API_KEY = process.env.STRIPE_API_KEY!;
+export const STRIPE_WEBHOOK_ENDPOINT_SECRET =
+  process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET!;
 
 export default checkEnvironmentVariables;

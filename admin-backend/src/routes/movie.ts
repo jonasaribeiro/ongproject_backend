@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { MovieController } from "../controllers";
-import { Validators, MovieMiddleware } from "../common/middlewares";
+import { Validators, MovieMiddleware } from "../middlewares";
 import { SMovieRequest, SMovieUpdate } from "../schemas";
 import { multerUploadMovie } from "../config/multer";
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { SerieController } from "../controllers";
-import { Validators, SerieMiddleware } from "../common/middlewares";
+import { Validators, SerieMiddleware } from "../middlewares";
 import { SSerieRequest, SSerieUpdate } from "../schemas";
 import { multerUploadSinglePoster } from "../config/multer";
 

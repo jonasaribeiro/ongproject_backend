@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 
 class WebhookController {
-  static acceptSubscription = async (req: Request, res: Response) => {
-    res.json({ reseived: true });
-  };
+  static handle = async (req: Request, res: Response) => {
+    const body = req.body;
 
-  static cancelSubscription = async (req: Request, res: Response) => {
-    res.json({ reseived: true });
+    // Pagamento concluido com sucesso
+    // invoice.payment.succeeded
+    // payment_intent.succeeded
+
+    res.send();
   };
 }
 

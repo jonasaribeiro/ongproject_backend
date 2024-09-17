@@ -4,6 +4,7 @@ import { UserService } from "../services/user";
 class UserController {
   static register = async (req: Request, res: Response) => {
     const newUser = await UserService.create(req.body);
+    // Criar perfil dentro do Stripe
     res.status(201).json(newUser);
   };
 

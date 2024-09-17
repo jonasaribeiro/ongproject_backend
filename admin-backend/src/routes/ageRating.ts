@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AgeRatingController } from "../controllers";
-import { AgeRatingMiddleware, Validators } from "../common/middlewares";
+import { AgeRatingMiddleware, Validators } from "../middlewares";
 import { SAgeRatingRequest, SAgeRatingUpdate } from "../schemas";
 
 const ageRatingRouter: Router = Router();

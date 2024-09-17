@@ -132,3 +132,6 @@ dist
 # video folder
 database/*
 !database/structure.json
+
+# Stripe
+stripe.exe

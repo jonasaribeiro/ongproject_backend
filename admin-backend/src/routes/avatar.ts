@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { AvatarController } from "../controllers";
-import { AvatarMiddleware, Validators } from "../common/middlewares";
+import { AvatarMiddleware, Validators } from "../middlewares";
 import { SAvatarRequest, SAvatarUpdate } from "../schemas";
 import { multerUploadSingleAvatar } from "../config/multer";
 

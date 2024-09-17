@@ -18,7 +18,9 @@ const app: Application = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../views"));
 
-app.use(express.raw());
+app.use(express.raw({ type: "application/json" }));
+app.use("/webhook", webhookRouter);
+
 app.use(express.static("public"));
 
 // View para formulário de upload
@@ -26,12 +28,9 @@ app.get("/upload-movie", (req, res) => {
   res.render("upload-movie");
 });
 
-// Webhook TODO:
-// Aceitar Pagamento ativar user
-// Recusar / Cancelar pagamento desativar user
-// Autenticar conexão para segurança
-// Bloquear firewall para rota apenas recebendo do asaas
-app.use("/webhook", webhookRouter);
+// webhook TODO:
+// Adicionar validação de webhook: Concluido
+// Adicionar execução de ação referente ao webhook (ativar e desativar usuario): A fazer
 
 app.use("/ageRating", ageRatingRouter);
 app.use("/avatar", avatarRouter);

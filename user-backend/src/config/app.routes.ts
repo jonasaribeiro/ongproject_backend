@@ -40,8 +40,11 @@ app.get("/stream/movies/:id/:folder/:fileName", StreamController.movieGetFile);
 // TODO Subscription
 // Criar link de pagamento e retornar para usuário
 
+// TODO Subscription Info
+// Criar link para visualizar informação sobre assinatura
+
 // TODO User
-// Criar conta do Asaas junto do perfil
+// Criar conta do Stripe junto do perfil
 app.use("/users", userRouter);
 app.use("/users/profile", profileRouter);
 app.use("/users/profile/restriction", restrictionRouter);

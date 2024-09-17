@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { CategoryController } from "../controllers";
-import { CategoryMiddleware, Validators } from "../common/middlewares";
+import { CategoryMiddleware, Validators } from "../middlewares";
 import { SCategoryRequest, SCategoryUpdate } from "../schemas";
 
 const categoryRouter: Router = Router();

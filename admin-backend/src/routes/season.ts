@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { SeasonController } from "../controllers";
-import { Validators, SeasonMiddleware } from "../common/middlewares";
+import { Validators, SeasonMiddleware } from "../middlewares";
 import { SSeasonRequest, SSeasonUpdate } from "../schemas";
 
 const seasonRouter: Router = Router();

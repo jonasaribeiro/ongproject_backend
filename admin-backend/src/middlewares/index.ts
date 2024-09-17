@@ -6,4 +6,4 @@ export * from "./movie";
 export * from "./resolution";
 export * from "./serie";
 export * from "./season";
-export * from "./validators";
+export * from "../common/middlewares/validators";

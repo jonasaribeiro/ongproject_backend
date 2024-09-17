@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ResolutionController } from "../controllers";
-import { ResolutionMiddleware, Validators } from "../common/middlewares";
+import { ResolutionMiddleware, Validators } from "../middlewares";
 import { SResolutionRequest, SResolutionUpdate } from "../schemas";
 
 const resolutionRouter: Router = Router();

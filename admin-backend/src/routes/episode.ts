@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { EpisodeController } from "../controllers";
-import { Validators, EpisodeMiddleware } from "../common/middlewares";
+import { Validators, EpisodeMiddleware } from "../middlewares";
 import { SEpisodeRequest, SEpisodeUpdate } from "../schemas";
 import { multerUploadSingleEpisode } from "../config/multer";
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import prisma from "../../config/prisma";
-import { AppError } from "../../errors/CustomErrors";
+import prisma from "../config/prisma";
+import { AppError } from "../errors/CustomErrors";
 
 class ResolutionMiddleware {
   static resolutionExists = async (

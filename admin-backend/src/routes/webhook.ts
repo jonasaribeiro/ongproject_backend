@@ -1,15 +1,14 @@
 import { Router } from "express";
-import checkIP from "../config/checkIP";
-import { ASAAS_IP_ADDRESSES } from "../config/environment";
+import WebhookController from "../controllers/webhook";
+import WebhookMiddlewares from "../middlewares/webhook";
 
 const webhookRouter = Router();
 
-webhookRouter.use(checkIP(ASAAS_IP_ADDRESSES));
-
-// PAYMENT_CONFIRMED = Liberar acesso a plataforma
-webhookRouter.post("/accepted");
-
-// PAYMENT_REFUNDED = Bloquear acesso a plataforma
-webhookRouter.post("/cancel");
+// Webhook handler
+webhookRouter.post(
+  "",
+  WebhookMiddlewares.validateWebhookRequest,
+  WebhookController.handle
+);
 
 export { webhookRouter };
