@@ -28,12 +28,11 @@ class LoginService {
     if (!passwordMatch) {
       throw new AppError("Invalid credentials", 403);
     }
-
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.SECRET_KEY!,
       {
-        expiresIn: process.env.EXPIRES_IN!,
+        expiresIn: process.env.TOKEN_EXPIRES_IN!,
         subject: "null",
       }
     );

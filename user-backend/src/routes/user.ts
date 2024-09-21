@@ -14,7 +14,15 @@ userRouter.post(
 );
 
 userRouter.get(
+  "/token",
+  Validators.tokenIsValid,
+  UserMiddleware.userExistsToken,
+  UserController.getByToken
+);
+
+userRouter.get(
   "/:id",
+  Validators.tokenIsValid,
   Validators.isUser,
   UserMiddleware.userExists,
   UserController.getById

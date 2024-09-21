@@ -66,6 +66,26 @@ class UserMiddleware {
 
     return next();
   };
+
+  static userExistsToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { id } = res.locals.userId;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    return next();
+  };
 }
 
 export { UserMiddleware };

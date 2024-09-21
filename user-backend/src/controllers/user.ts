@@ -14,6 +14,13 @@ class UserController {
     res.status(200).json(user);
   };
 
+  static getByToken = async (req: Request, res: Response) => {
+    const userId = res.locals.userId;
+    const user = await UserService.getById(userId);
+
+    res.status(200).json(user);
+  };
+
   static update = async (req: Request, res: Response) => {
     const userId = req.params.id;
     const updatedUser = await UserService.update(userId, req.body);

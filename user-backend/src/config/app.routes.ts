@@ -20,8 +20,22 @@ import {
   watchingMovieRouter,
   watchingSerieRouter,
 } from "../routes";
+import cors from "cors";
 
 const app: Application = express();
+
+const whiteList = ["http://localhost:3000", "http://127.0.0.1:3000"];
+
+const corsOptions = {
+  origin(origin: string | undefined, cb: Function) {
+    if (whiteList.indexOf(origin!) !== -1 || !origin) {
+      cb(null, true);
+    } else {
+      cb(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../views"));
@@ -33,6 +47,7 @@ app.get("/player", (req, res) => {
 });
 
 app.use(express.json());
+app.use(cors(corsOptions));
 
 app.get("/stream/movies/:id/master.m3u8", StreamController.movieGetMaster);
 app.get("/stream/movies/:id/:folder/:fileName", StreamController.movieGetFile);
