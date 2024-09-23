@@ -1,42 +1,42 @@
-import dotenv from "dotenv";
 import { EnvironmentVariableError } from "../errors/CustomErrors";
 
+const dotenv = require("dotenv");
 dotenv.config();
 
-const REQUIRED_ENV_VARIABLES = {
-  common: ["DATABASE_URL", "SECRET_KEY", "TOKEN_EXPIRES_IN", "VIDEO_STORAGE_PATH"],
-  development: [],
-  production: [],
-  test: [],
-};
-
-type EnvironmentType = "development" | "production" | "test";
+const REQUIRED_ENV_VARIABLES = [
+  "DATABASE_URL",
+  "SECRET_KEY",
+  "TOKEN_EXPIRES_IN",
+  "VIDEO_STORAGE_PATH",
+  "SERVER_PORT",
+  "STRIPE_API_KEY",
+];
 
 function checkEnvironmentVariables(): void {
-  const currentEnv = (process.env.NODE_ENV || "development") as EnvironmentType;
-
-  const requiredVariables = [
-    ...REQUIRED_ENV_VARIABLES.common,
-    ...REQUIRED_ENV_VARIABLES[currentEnv],
-  ];
-
-  const missingVariables = requiredVariables.filter(
-    (variable) =>
+  const missingRequired = REQUIRED_ENV_VARIABLES.filter(
+    variable =>
       typeof process.env[variable] === "undefined" ||
       process.env[variable] === ""
   );
 
-  if (missingVariables.length > 0)
-    throw new EnvironmentVariableError(missingVariables);
+  if (missingRequired.length > 0) {
+    if (!process.env.SKIP_ENV_VALIDATION) {
+      throw new EnvironmentVariableError(missingRequired);
+    } else {
+      console.warn(
+        `Warning: Missing required environment variables: ${missingRequired.join(
+          ", "
+        )}. Running with SKIP_ENV_VALIDATION enabled.`
+      );
+    }
+  }
 }
 
-export const SERVER_PORT = process.env.SERVER_PORT
-  ? parseInt(process.env.SERVER_PORT)
-  : 3000;
-
+export const SERVER_PORT = parseInt(process.env.SERVER_PORT!);
 export const DATABASE_URL = process.env.DATABASE_URL!;
 export const SECRET_KEY = process.env.SECRET_KEY!;
 export const TOKEN_EXPIRES_IN = process.env.TOKEN_EXPIRES_IN!;
 export const VIDEO_STORAGE_PATH = process.env.VIDEO_STORAGE_PATH!;
+export const STRIPE_API_KEY = process.env.STRIPE_API_KEY!;
 
 export default checkEnvironmentVariables;

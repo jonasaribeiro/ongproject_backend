@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import stripe from "../config/stripe";
 
 class SubscriptionController {
   static generateCheckoutLink = async (req: Request, res: Response) => {
@@ -6,7 +7,12 @@ class SubscriptionController {
   };
 
   static generateClientLink = async (req: Request, res: Response) => {
-    // stripe.billingPortal.sessions.create
+    const customerId = req.body.stripeCustomerId;
+
+    const { url } = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+    });
+    res.json({ url });
   };
 }
 

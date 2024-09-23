@@ -4,9 +4,19 @@ class WebhookController {
   static handle = async (req: Request, res: Response) => {
     const body = req.body;
 
+    // invoice.paid
+    //
+
     // Pagamento concluido com sucesso
-    // invoice.payment.succeeded
-    // payment_intent.succeeded
+    // status tem que estar "active"
+
+    // Assinatura deletada
+    // status diferente de "active"
+
+    // Adicionar uma tabela para manipular informações sobre assinatura
+    // Subscription
+    // Status
+    // ActiveTill
 
     res.send();
   };
